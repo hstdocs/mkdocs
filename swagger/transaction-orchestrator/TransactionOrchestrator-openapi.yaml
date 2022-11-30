@@ -1,0 +1,357 @@
+#
+#  (c) COPYRIGHT 2021 HST EQUIPAMENTOS
+#  ELETRONICOS Ltda, Campinas (SP), Brasil
+#  ALL RIGHTS RESERVED - TODOS OS DIREITOS RESERVADOS
+#  CONFIDENTIAL, UNPUBLISHED PROPERTY OF HST E. E. Ltda
+#  PROPRIEDADE CONFIDENCIAL NAO PUBLICADA DA HST Ltda.
+#
+
+openapi: 3.0.1
+info:
+  title: HST PaymentQR - Transaction Orchestrator
+  description: The PaymentQR Transaction Orchestrator Documentation.
+  version: 1.0.0
+servers:
+- url: http://localhost:8888/orchestrator/v1/
+- url: https://sandbox-qrpayment01.test-teste-prueba.com:9207/to/v1/
+- url: https://homolog-api-gateway.test-teste-prueba.com:9208/to/v1/
+paths:
+  /confirmations:
+    post:
+      tags:
+      - Transaction Orchestrator
+      summary: The confirmation operation is a server-side API, intended for server-based communication.
+      operationId: receiveConfirmations
+      parameters:
+        - in: header
+          name: request-id
+          schema: 
+            $ref: '#/components/schemas/RequestID'
+          required: true
+      requestBody:
+        description: Confirmations request
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConfirmationsRequest'
+      responses:
+        "204":
+          description: "No content."
+          
+    /preparedata:
+      post:
+        tags:
+        - Transaction Orchestrator
+        summary: Service is a server-side API that receives the transaction read by the wallet, and performs the processing of the object and sends the payment request to the Visa SRC flow.
+      operationId: prepareData
+      parameters:
+        - in: header
+          name: request-id
+          schema: 
+            $ref: '#/components/schemas/RequestID'
+          required: true
+      requestBody:
+        description: Confirmations request
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PrepareDataRequest'
+      responses:
+        "204":
+          description: "No content."
+  /ping:
+    get:
+      tags:
+      - Transaction Orchestrator
+      summary: Ping to verify the Orchestrator health.
+      operationId: ping
+      responses:
+        "200":
+          description: Sucess.
+          content:
+            application/json:
+              example: {"ok":"OK"}
+        "500":
+          description: Error or unavailability.  
+components:
+  schemas:
+    ConfirmationsRequest:
+      type: object
+      properties:
+        provisionTokenID:
+          $ref: '#/components/schemas/ProvisionTokenID'
+        merchQRCodeData:
+          $ref: '#/components/schemas/MerchQRCodeData'
+        deviceID:
+          $ref: '#/components/schemas/DeviceId'
+        cardType: 
+          $ref: '#/components/schemas/CardType'
+        dateSystem: 
+          $ref: '#/components/schemas/DateSystem'
+        requestID:
+          $ref: '#/components/schemas/RequestID'
+        institutionCode: 
+          $ref: '#/components/schemas/InstitutionCode'
+          
+    PrepareDataRequest:
+      type: object
+      properties:
+        provisionTokenID:
+          $ref: '#/components/schemas/ProvisionTokenID'
+        merchQRCodeData:
+          $ref: '#/components/schemas/MerchQRCodeData'
+        deviceID:
+          $ref: '#/components/schemas/DeviceId'
+        cardType: 
+          $ref: '#/components/schemas/CardType'
+        dateSystem: 
+          $ref: '#/components/schemas/DateSystem'
+        requestID:
+          $ref: '#/components/schemas/RequestID'
+        institutionCode: 
+          $ref: '#/components/schemas/InstitutionCode'
+          
+    ProvisionTokenID:
+      type: string
+      description: "The Provision Token unique identifier."
+      example: "8cf5a6d8f775db1ee77817c66ac7c901"
+      
+    MerchQRCodeData:
+      type: string
+      description: "Merchant QR code data."
+      example: "{\"mAddDataFieldTmplRFU\":[],\"mBit55\":[],\"mInputData\":[{\"mObject\":\"VALUE_TIP\",\"mValue\":\"0.06\"}],\"mMerchantAccountInfo\":[[\"03\\u003dhst-pmt-fac-visa-id\"],[\"30\\u003d0011uy.com.vnet010802027264\",\"00\\u003duy.com.vnet\",\"01\\u003d02027264\"]],\"mPaymentSysSpecific\":[],\"mPointOfInitiationMethod\":\"DYNAMIC_QRCODE\",\"mTransactionInfo\":[{\"mObject\":\"MERCHANT_CATEGORY_CODE\",\"mValue\":\"5541\"},{\"mObject\":\"TRANSACTION_CURRENCY\",\"mValue\":\"840\"},{\"mObject\":\"TRANSACTION_AMOUNT\",\"mValue\":\"1.12\"},{\"mObject\":\"TIP_CONVENIENCE_INDICATOR\",\"mValue\":\"01\"},{\"mObject\":\"COUNTRY_CODE\",\"mValue\":\"UY\"},{\"mObject\":\"MERCHANT_NAME\",\"mValue\":\"AXION - EL TIGRE\"},{\"mObject\":\"MERCHANT_CITY\",\"mValue\":\"Uruguay\"},{\"mObject\":\"BILL_NUMBER\",\"mValue\":\"00000000\"},{\"mObject\":\"STORE_LABEL\",\"mValue\":\"001X17G8W01\"},{\"mObject\":\"TERMINAL_LABEL\",\"mValue\":\"42\"},{\"mObject\":\"PURPOSE_OF_TRANSACTION\",\"mValue\":\"01\"}],\"mUnreservedTemplates\":[[\"80\",\"00\\u003duy.com.vnet\",\"01\\u003d01\",\"02\\u003d06\",\"03\\u003d1.12\",\"04\\u003d1.02\",\"05\\u003d0\",\"06\\u003d0\"]],\"mVersion\":\"1.1\"}"
+        
+      
+    DeviceId:
+      type: integer
+      format: int64
+      description: "The device unique identifier."
+      example: 15331
+      
+    CardType:
+      type: integer
+      description: > 
+        Field that show the card type. Possible valid card types are:
+        
+        
+        * `1` - CREDIT
+        
+        * `2` - DEBIT
+      example: 1
+      enum:
+        - 1
+        - 2
+        
+    DateSystem:
+      type: string
+      format: date
+      example: 211020130400
+      
+    RequestID:
+      type: string
+      description: "The auto generated request identifier used for tracking the request."
+      example: "23asd45d1"
+      
+    InstitutionCode:
+      type: string
+      description: "A code generated by HST that identifies the Issuer during the request."
+      example: 'HST-123'
+      
+    MAddDataFieldTmplRFU:
+      type: array
+      items:
+        type: string
+      example: []
+    
+    MBit55:
+      type: string
+      format: byte
+      example: []
+      
+    MInputData:
+      type: array
+      description: The objects in this array are of type `DataObjectInfo`.
+      items:
+        type: object
+        $ref: '#/components/schemas/DataObjectInput'
+    
+    MObject:
+      type: string
+      description: > 
+        Data object types (see the `DataObject` Schema and `DataFormat` enum). Valid values are:
+        
+        
+        * `POI_METHOD` - DataFormat.NUMERIC -  Point of Initiation Method - Length 2
+      
+        * `TRANSACTION_AMOUNT` - DataFormat.ALPHA_NUMERIC_SPECIAL - Transaction Amount - Length 13
+        
+        * `TRANSACTION_CURRENCY` - DataFormat.NUMERIC - Transaction Currency - Length 3
+        
+        * `TIP_CONVENIENCE_INDICATOR` - DataFormat.NUMERIC - Tip or convenience indicator - Length 2
+        
+        * `VALUE_TIP` - DataFormat.ALPHA_NUMERIC_SPECIAL - Tip to be paid to the Merchant - Length 13
+        
+        * `VALUE_CONVENIENCE_FEE_FIXED` - DataFormat.ALPHA_NUMERIC_SPECIAL - Value of Convenience Fee Fixed - Length 13
+        
+        * `VALUE_CONVENIENCE_FEE_PERCENTAGE` - DataFormat.ALPHA_NUMERIC_SPECIAL - Value of Convenience Fee porcentage - Length 5
+        
+        * `GLOBALLY_UNIQUE_IDENTIFIER` - DataFormat.ALPHA_NUMERIC_SPECIAL - Globally Unique Identifier - Length 32
+        
+        * `COUNTRY_CODE` - DataFormat.ALPHA_NUMERIC_SPECIAL - Country Code - Length 2
+        
+        * `MERCHANT_CATEGORY_CODE` - DataFormat.NUMERIC - Merchant Category Code - Length 4
+        
+        * `MERCHANT_NAME` - DataFormat.ALPHA_NUMERIC_SPECIAL - Merchant Name - Length 25
+        
+        * `MERCHANT_CITY` - DataFormat.ALPHA_NUMERIC_SPECIAL - Merchant City - Length 15
+        
+        * `POSTAL_CODE` - DataFormat.ALPHA_NUMERIC_SPECIAL - Postal Code - Length 10
+        
+        * `LANGUAGE_PREFERENCE` - DataFormat.ALPHA_NUMERIC_SPECIAL - Language Preference - Length 2
+        
+        * `MERCHANT_NAME_ALT_LANGUAGE` - DataFormat.STRING - Merchant Name—Alternate Language - Length 25
+        
+        * `MERCHANT_CITY_ALT_LANGUAGE` - DataFormat.STRING - Merchant City—Alternate Language - Length 15
+        
+        * `BILL_NUMBER` - DataFormat.ALPHA_NUMERIC_SPECIAL - Bill Number - Length 25
+        
+        * `MOBILE_NUMBER` - DataFormat.ALPHA_NUMERIC_SPECIAL - Mobile Number - Length 25
+        
+        * `STORE_LABEL` - DataFormat.ALPHA_NUMERIC_SPECIAL - Store Label - Length 25
+        
+        * `LOYALTY_NUMBER` - DataFormat.ALPHA_NUMERIC_SPECIAL - Loyalty Number - Length 25
+        
+        * `REFERENCE_LABEL` - DataFormat.ALPHA_NUMERIC_SPECIAL - Reference Label - Length 25
+        
+        * `CUSTOMER_LABEL` - DataFormat.ALPHA_NUMERIC_SPECIAL - Customer Label - Length 25
+        
+        * `TERMINAL_LABEL` - DataFormat.ALPHA_NUMERIC_SPECIAL - Terminal Label - Length 25
+        
+        * `PURPOSE_OF_TRANSACTION` - DataFormat.ALPHA_NUMERIC_SPECIAL - Purpose of Transaction - Length 25
+        
+        * `ADDRESS_OF_CONSUMER` - DataFormat.STRING - Address of the consumer - Length 32
+        
+        * `MOBILE_NUMBER_CONSUMER` - DataFormat.ALPHA_NUMERIC_SPECIAL - Mobile number of the consumer - Length 25
+        
+        * `EMAIL_CONSUMER` - DataFormat.STRING - Email address of the consumer - Length 64
+      enum:
+        - POI_METHOD
+        - TRANSACTION_AMOUNT
+        - TRANSACTION_CURRENCY
+        - TIP_CONVENIENCE_INDICATOR
+        - VALUE_TIP
+        - VALUE_CONVENIENCE_FEE_FIXED
+        - VALUE_CONVENIENCE_FEE_PERCENTAGE
+        - GLOBALLY_UNIQUE_IDENTIFIER
+        - COUNTRY_CODE
+        - MERCHANT_CATEGORY_CODE
+        - MERCHANT_NAME
+        - MERCHANT_CITY
+        - POSTAL_CODE
+        - LANGUAGE_PREFERENCE
+        - MERCHANT_NAME_ALT_LANGUAGE
+        - MERCHANT_CITY_ALT_LANGUAGE 
+        - BILL_NUMBER
+        - MOBILE_NUMBER
+        - STORE_LABEL
+        - LOYALTY_NUMBER
+        - REFERENCE_LABEL
+        - CUSTOMER_LABEL
+        - TERMINAL_LABEL
+        - PURPOSE_OF_TRANSACTION
+        - ADDRESS_OF_CONSUMER
+        - MOBILE_NUMBER_CONSUMER
+        - EMAIL_CONSUMER
+      example: TRANSACTION_AMOUNT
+      
+    DataObject:
+      type: object
+      description: This object is an `MObject`, where each enum contains, respectively, DataFormat, Length, and Description.
+      properties: 
+        mFormat:
+          type: string
+          example: DataFormat.ALPHA_NUMERIC_SPECIAL
+        mLength:
+          type: integer
+          example: 25
+        mDescription:
+          type: string
+          example: "Mobile number of the consumer"
+    
+    DataObjectInfo:
+      type: object
+      properties:
+        mObject:
+          $ref: '#/components/schemas/MObject'
+        mValue:
+          $ref: '#/components/schemas/MValue'
+          
+    DataObjectInput: 
+      properties:
+        mObject:
+          $ref: '#/components/schemas/MObject'
+        mValue:
+          $ref: '#/components/schemas/MValue'
+          
+    MMerchantAccountInfo:
+      type: array
+      items:
+        type: string
+        example: [["30","00 u003duy.com.vnet","01 u003d01000753"]]
+        
+    MPaymentSysSpecific:
+      type: array
+      items:
+        type: string
+        example: 
+        
+    MPointOfInitializationMethod:
+        $ref: '#/components/schemas/PointOfInit'
+    
+    PointOfInit:
+      type: string
+      description: >
+        Point of initialization. Valid values are:
+          
+        * `STATIC_QRCODE` - Value 11
+        
+        * `DYNAMIC_QRCODE` - Value 12
+      
+      enum:
+        - STATIC_QRCODE
+        - DYNAMIC_QRCODE
+        
+    MTransactionInfo:
+      type: array
+      items:
+        type: object
+        properties: 
+          dataObjectInfo:
+            $ref: '#/components/schemas/DataObjectInfo'
+            
+    MValue:
+      type: string
+      example: "2.00"
+      
+    MUnreservedTemplates:
+      type: array
+      items:
+        type: string
+        example: [["80","00 u003duy.com.vnet","01 u003d01","02 u003d01","03 u003d0.90","04 u003d0.74","05 u003d0","06 u003d22"]]
+        
+    MVersion:
+      type: string
+      example: "1.1"
+      
+    DataFormat:
+      type: string
+      description: >
+        Valid values are:
+          * `NUMERIC`
+          * `ALPHA_NUMERIC_SPECIAL`
+          * `STRING` 
+      enum:
+        - NUMERIC
+        - ALPHA_NUMERIC_SPECIAL
+        - STRING
+        

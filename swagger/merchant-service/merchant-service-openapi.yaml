@@ -1,0 +1,333 @@
+openapi: 3.0.3
+info:
+  title: HST PaymentQR - Merchant Service
+  description: This API provides the Visa and MasterCard onboard for merchants to be allowed to generate qr code and do payment operations.
+  version: 1.0.0
+servers:
+  - url: https://sandbox-qrpayment01.test-teste-prueba.com:9207/v1/merchant
+    description: 'Sandbox'
+  - url: https://homolog-api-gateway.test-teste-prueba.com:9208/v1/merchant
+    description: 'Homolog'
+  - url: https://api-gateway.shieldedtransaction.com/v1/merchant
+    description: 'Production'
+
+paths:
+  /v1/merchant/ping:
+    get:
+      tags:
+        - Merchant Service V1
+      description: Sends a ping to verify Merchant Service health.
+      operationId: merchantPing
+      responses:
+        200:
+          description: OK.
+
+  /v1/merchant/onboarding:
+    post:
+      tags:
+        - Merchant Service V1
+      description: Provides the HST onboarding, and brand onboarding operation for a merchant.
+      operationId: merchantOnboarding
+      parameters:
+        - in: header
+          name: request-id
+          schema:
+            $ref: '#/components/schemas/RequestID'
+          required: true
+        - in: header
+          name: apiKey
+          schema:
+            $ref: '#/components/schemas/ApiKey'
+          required: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MerchantOnboardingInfo'
+
+      responses:
+        201:
+          description: The success response for the merchant onboarding.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BrandOnboardingSuccessResponse'
+
+        400:
+          description: The error response for the merchant onboarding.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BrandOnboardingErrorResponse'
+        500:
+          description: The error info response for the merchant onboarding.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ErrorInfo'
+
+components:
+  schemas:
+
+    ApiKey:
+      type: string
+      description: The code sent by API Gateway to know which acquirer is originated the request.
+
+    RequestID:
+      type: string
+      description: The auto generated request ID used for tracking the request.
+
+    MerchantCode:
+      type: string
+      description: The merchant identifier code defined by the acquirer.
+      maxLength: 32
+      example: '12122'
+
+    Name:
+      type: string
+      description: The merchant trade name.
+      maxLength: 64
+      example: 'CLUB DE GOLF DEL URUGUAY'
+
+    Mcc:
+      type: string
+      description: Identifies the Merchant category code, according to ISO 18245.
+      maxLength: 64
+      example: '6012'
+
+    City:
+      type: string
+      description: The merchant city.
+      maxLength: 64
+      example: 'Montevideo'
+
+    CountryCode:
+      type: string
+      maxLength: 2
+      description: The merchant country code in the two characters format.
+      example: 'UY'
+
+    CategoryName:
+      type: string
+      description: Merchant category name, according to ISO 18245.
+      maxLength: 32
+      example: 'Financial Institutions'
+
+    DocumentNumber:
+      type: string
+      maxLength: 16
+      description: The document number.
+      example: '211057310015'
+
+    FantasyName:
+      type: string
+      maxLength: 64
+      description: The merchant fantasy name.
+      example: 'CLUB DE GOLF - RESTORAN'
+
+    PrimaryContactFirstName:
+      type: string
+      maxLength: 64
+      description: The merchant primary contact first name.
+      example: 'Joao'
+
+    PrimaryContactLastName:
+      type: string
+      maxLength: 64
+      description: The merchant primary contact last name.
+      example: 'Da Silva'
+
+    PrimaryContactEmail:
+      type: string
+      maxLength: 64
+      description: The merchant primary contact e-mail address.
+      example: 'joao@clubdegolfrestorant.com.br'
+
+    PrimaryWebsiteURL:
+      type: string
+      maxLength: 64
+      description: The merchant primary website URL.
+      example: 'www.clubdegolfrestorant.com'
+
+    Brand:
+      type: string
+      description: >
+        The brand that will be chosen for the onboarding operation.
+          * `VISA` - Visa
+          * `MASTERCARD` - MasterCard
+
+      enum:
+        - 'VISA'
+        - 'MASTERCARD'
+
+    AcquirerId:
+      type: string
+      description: The acquirer identifier defined by the brand.
+      maxLength: 32
+      example: '10038823'
+
+    AcquirerMerchantId:
+      type: string
+      description: Merchant identifier defined by the Brand.
+      maxLength: 32
+      example: '02041657'
+
+    MerchantBrandCode:
+      type: string
+      description: Represents the merchant identifier defined by the acquirer for the specific brand, when the merchantCode is other value of acquirer internal id.
+      maxLength: 32
+      example: '55556'
+
+    MerchantOnboardingInfo:
+      type: object
+      description: The merchant information used in the onboarding process.
+      required:
+        - primaryWebsiteURL
+        - brandsInfo
+        - primaryContactFirstName
+        - primaryContactLastName
+        - primaryContactEmail
+        - merchantCode
+        - merchantName
+        - mcc
+        - categoryName
+        - city
+        - countryCode
+        - documentNumber
+        - fantasyName
+        - name
+      properties:
+        merchantCode:
+          $ref: '#/components/schemas/MerchantCode'
+        name:
+          $ref: '#/components/schemas/Name'
+        mcc:
+          $ref: '#/components/schemas/Mcc'
+        categoryName:
+          $ref: '#/components/schemas/CategoryName'
+        city:
+          $ref: '#/components/schemas/City'
+        countryCode:
+          $ref: '#/components/schemas/CountryCode'
+        documentNumber:
+          $ref: '#/components/schemas/DocumentNumber'
+        fantasyName:
+          $ref: '#/components/schemas/FantasyName'
+        primaryContactFirstName:
+          $ref: '#/components/schemas/PrimaryContactFirstName'
+        primaryContactLastName:
+          $ref: '#/components/schemas/PrimaryContactLastName'
+        primaryContactEmail:
+          $ref: '#/components/schemas/PrimaryContactEmail'
+        primaryWebsiteURL:
+          $ref: '#/components/schemas/PrimaryWebsiteURL'
+        brandsInfo:
+          type: array
+          items:
+            $ref: '#/components/schemas/BrandInfo'
+
+
+    BrandOnboardingSuccessResponse:
+      allOf:
+        - $ref: '#/components/schemas/BrandResponse'
+        - type: object
+      type: object
+      description: The onboarded merchant identification on the brand.
+      properties:
+        merchantCode:
+          $ref: '#/components/schemas/MerchantCode'
+        acquirerId:
+          $ref: '#/components/schemas/AcquirerId'
+        merchantBrandCode:
+          $ref: '#/components/schemas/MerchantBrandCode'
+        acquirerMerchantId:
+          $ref: '#/components/schemas/AcquirerMerchantId'
+
+    BrandOnboardingErrorResponse:
+      allOf:
+        - $ref: '#/components/schemas/BrandResponse'
+        - type: object
+      type: object
+      description: The error response returned by the brand for the onboarding operation.
+      properties:
+        responseStatus:
+          $ref: '#/components/schemas/ResponseStatus'
+
+    BrandResponse:
+      type: object
+      properties:
+        brand:
+          $ref: '#/components/schemas/Brand'
+
+    BrandInfo:
+      type: object
+      properties:
+        brand:
+          $ref: '#/components/schemas/Brand'
+        merchantBrandCode:
+          $ref: '#/components/schemas/MerchantBrandCode'
+
+    ResponseStatus:
+      type: object
+      properties:
+        code:
+          type: string
+          description: The error code defined by the brand.
+          example: '2940'
+        message:
+          type: string
+          description: The brand error summary description.
+          example: 'Invalid request'
+        details:
+          type: string
+          description: The brand detailed error message.
+          example: 'There is an onboarding error please reach out to Visa'
+        additionAttributes:
+          type: object
+          additionalProperties: true
+          description: The error addition attributes.
+          example: '{}'
+        info:
+          type: string
+          description: Brand own error reference information.
+          example: 'http://api.visa.com/docs/errors/2940'
+
+    ErrorInfo:
+      type: object
+      required:
+        - returnCode
+        - request-id
+      properties:
+        request-id:
+          $ref: '#/components/schemas/RequestID'
+        timestamp:
+          type: string
+          description: The date-time when the error occurred.
+          example: '2017-07-21T17:32:28Z'
+        returnCode:
+          $ref: '#/components/schemas/ReturnCode'
+        returnDescription:
+          type: string
+          description: Error  description  returned  only  in  error conditions  for  troubleshooting purpose.
+          example: An error occurred while executing the merchant onboarding process.
+
+    ReturnCode:
+      type: string
+      description: >
+        The responses for the requests can return the following values on the 'returnCode' property:
+         * `01` - Ok with a warning condition. Check the 'returnDescription' property for more details.
+         * `02` - An error occurred while executing the brand onboarding process.
+         * `03` - An error occurred while executing the merchant onboarding process.
+
+      example: "01"
+      enum:
+        - '01'
+        - '02'
+        - '03'

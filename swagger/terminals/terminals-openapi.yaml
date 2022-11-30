@@ -1,0 +1,678 @@
+#
+#  (c) COPYRIGHT 2021 HST EQUIPAMENTOS
+#  ELETRONICOS Ltda, Campinas (SP), Brasil
+#  ALL RIGHTS RESERVED - TODOS OS DIREITOS RESERVADOS
+#  CONFIDENTIAL, UNPUBLISHED PROPERTY OF HST E. E. Ltda
+#  PROPRIEDADE CONFIDENCIAL NAO PUBLICADA DA HST Ltda.
+#
+
+openapi: 3.0.3
+info:
+  title: HST PaymentQR - Terminals
+  description: The PaymentQR Terminals API.
+  version: 2.0.0
+servers:
+  - url: https://sandbox-qrpayment01.test-teste-prueba.com:9207/v1/terminals
+    description: 'Sandbox'
+  - url: https://homolog-api-gateway.test-teste-prueba.com:9208/v1/terminals
+    description: 'Homolog'
+  - url: https://api-gateway.shieldedtransaction.com/v1/terminals
+    description: 'Production'
+
+paths:
+  /v1/terminals/ping:
+    get:
+      tags:
+        - V1
+      summary: Sends a ping to verify terminals service health.
+      operationId: terminalsPing
+      responses:
+        200:
+          description: Success.
+
+  /v1/terminals/enable:
+    post:
+      tags:
+        - V1
+      summary: >-
+        Creates a new terminal eligible for performing transactions on QR Code
+        platform, also creates a new merchant if the merchant used in the terminal configuration does not exists.
+      operationId: enableTerminal
+      parameters:
+        - in: header
+          name: request-id
+          description: The auto generated request ID used for tracking the request.
+          schema:
+            type: string
+          required: true
+        - in: header
+          name: apiKey
+          schema:
+            $ref: '#/components/schemas/ApiKey'
+          required: true
+      requestBody:
+        description: The terminal configuration data provided by the client.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TerminalConfigurationV1'
+      responses:
+        200:
+          description: The success response model for the EnableTerminals request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TerminalSuccessResponse'
+        401:
+          description: Unauthorized access.
+        500:
+          description: Internal server error. Check the returnCode and returnMessage for more details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorInfo'
+
+  /v2/terminals/enable:
+    post:
+      tags:
+        - V2
+      summary: >-
+        Creates a new terminal eligible for performing transactions on QR Code
+        platform.
+      operationId: enableTerminalV2
+      parameters:
+        - in: header
+          name: request-id
+          description: The auto generated request ID used for tracking the request.
+          schema:
+            type: string
+          required: true
+        - in: header
+          name: apiKey
+          schema:
+            $ref: '#/components/schemas/ApiKey'
+          required: true
+      requestBody:
+        description: The terminal configuration data provided by the client.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TerminalConfigurationV2'
+      responses:
+        200:
+          description: The success response model for the EnableTerminals request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TerminalSuccessResponse'
+        401:
+          description: Unauthorized access.
+        500:
+          description: Internal server error. Check the returnCode and returnMessage for more details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorInfo'
+
+  /v1/terminals/list:
+    get:
+      tags:
+        - V1
+      summary: >-
+        Returns a list of the enabled terminals on the QR Code platform.
+      operationId: retrieveTerminals
+      parameters:
+        - in: header
+          name: request-id
+          description: The auto generated request ID used for tracking the request.
+          schema:
+            type: string
+          required: true
+        - in: header
+          name: apiKey
+          schema:
+            $ref: '#/components/schemas/ApiKey'
+          required: true
+      responses:
+        200:
+          description: The sucess response model for the retrieve terminals request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrieveTerminalsResponse'
+        401:
+          description: Unauthorized access.
+        500:
+          description: Internal server error. Check the returnCode and returnMessage for more details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorInfo'
+
+  /v1/terminals/{terminalCode}:
+    delete:
+      tags:
+        - V1
+      summary: >-
+        Deletes a terminal and prevent it of performing transactions on the QR Code platform.
+      operationId: deleteTerminal
+      parameters:
+        - in: header
+          name: request-id
+          description: The auto generated request ID used for tracking the request.
+          schema:
+            type: string
+          required: true
+        - in: path
+          name: terminalCode
+          description: The terminal identifier.
+          schema:
+            $ref: '#/components/schemas/TerminalCode'
+          required: true
+        - in: header
+          name: apiKey
+          schema:
+            $ref: '#/components/schemas/ApiKey'
+          required: true
+      responses:
+        200:
+          description: The success response model for the delete request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TerminalSuccessResponse'
+        401:
+          description: Unauthorized access.
+        500:
+          description: Internal server error. Check the returnCode and returnMessage for more details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorInfo'
+  /v1/terminals/update:
+    post:
+      tags:
+        - V1
+      summary: >-
+        Updates a terminal configuration of a previous onboarded terminal, also updates the merchant information.
+      operationId: updateTerminal
+      parameters:
+        - in: header
+          name: request-id
+          description: The auto generated request ID used for tracking the request.
+          schema:
+            type: string
+          required: true
+        - in: header
+          name: apiKey
+          schema:
+            $ref: '#/components/schemas/ApiKey'
+          required: true
+      requestBody:
+        description: The terminal configuration data provided by the client.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TerminalConfigurationV1'
+      responses:
+        200:
+          description: The sucess response model for the Update Terminal request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TerminalSuccessResponse'
+        401:
+          description: Unauthorized access.
+        500:
+          description: Internal server error. Check the returnCode and returnMessage for more details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorInfo'
+
+  /v2/terminals/update:
+    post:
+      tags:
+        - V2
+      summary: >-
+        Updates a terminal configuration of a previous onboarded terminal.
+      operationId: updateTerminalV2
+      parameters:
+        - in: header
+          name: request-id
+          description: The auto generated request ID used for tracking the request.
+          schema:
+            type: string
+          required: true
+        - in: header
+          name: apiKey
+          schema:
+            $ref: '#/components/schemas/ApiKey'
+          required: true
+      requestBody:
+        description: The terminal configuration data provided by the client.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TerminalConfigurationV2'
+      responses:
+        200:
+          description: The success response model for the Update Terminal request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TerminalSuccessResponse'
+        401:
+          description: Unauthorized access.
+        500:
+          description: Internal server error. Check the returnCode and returnMessage for more details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorInfo'
+
+  /v1/terminals/{terminalCode}/configuration:
+    get:
+      tags:
+        - V1
+      summary: >-
+        Returns all the configuration of a specific terminal enabled on the QR Code platform.
+      operationId: retrieveTerminalConfig
+      parameters:
+        - in: header
+          name: request-id
+          description: The auto generated request ID used for tracking the request.
+          schema:
+            type: string
+          required: true
+        - in: path
+          name: terminalCode
+          schema:
+            $ref: '#/components/schemas/TerminalCode'
+          required: true
+        - in: header
+          name: apiKey
+          schema:
+            $ref: '#/components/schemas/ApiKey'
+          required: true
+      responses:
+        200:
+          description: The success response model for the retrieve terminal configuration request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrieveTerminalConfigResponse'
+        401:
+          description: Unauthorized access.
+        500:
+          description: Internal server error. Check the returnCode and returnMessage for more details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorInfo'
+
+  /v1/terminals/{terminalCode}/status:
+    get:
+      tags:
+        - V1
+      summary: >-
+        Returns all the details of a specific terminal enabled on the QR Code platform.
+      operationId: retrieveTerminalStatus
+      parameters:
+        - in: header
+          name: request-id
+          description: The auto generated request ID used for tracking the request.
+          schema:
+            type: string
+          required: true
+        - in: path
+          name: terminalCode
+          schema:
+            $ref: '#/components/schemas/TerminalCode'
+          required: true
+        - in: header
+          name: apiKey
+          schema:
+            $ref: '#/components/schemas/ApiKey'
+          required: true
+      responses:
+        200:
+          description: The success response model for the retrieve terminal details request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrieveTerminalDetailsResponse'
+        401:
+          description: Unauthorized access.
+        500:
+          description: Internal server error. Check the returnCode and returnMessage for more details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorInfo'
+
+components:
+  schemas:
+    TerminalConfigurationV1:
+      type: object
+      description: Terminal configuration object for Terminals Service version 1 APIs.
+      required:
+        - terminalCode
+        - automaticBatchClose
+        - staticQR
+        - manualEntry
+        - promotionsEnabled
+        - branchInfo
+        - acceptTip
+        - merchantInfo
+      properties:
+        terminalCode:
+          $ref: '#/components/schemas/TerminalCode'
+        automaticBatchClose:
+          $ref: '#/components/schemas/AutomaticBatchClose'
+        staticQR:
+          $ref: '#/components/schemas/StaticQR'
+        acceptTip:
+          $ref: '#/components/schemas/AcceptTip'
+        manualEntry:
+          $ref: '#/components/schemas/ManualEntry'
+        promotionsEnabled:
+          $ref: '#/components/schemas/PromotionsEnabled'
+        taxIndicator:
+          $ref: '#/components/schemas/TaxIndicator'
+        taxValue:
+          $ref: '#/components/schemas/TaxValue'
+        merchantInfo:
+          $ref: '#/components/schemas/MerchantInfo'
+        branchInfo:
+          $ref: '#/components/schemas/BranchInfo'
+    
+    TerminalConfigurationV2:
+      type: object
+      description: Terminal configuration object for Terminals Service version 1 APIs.
+      required:
+        - terminalCode
+        - automaticBatchClose
+        - staticQR
+        - manualEntry
+        - promotionsEnabled
+        - branchInfo
+        - acceptTip
+        - merchantCode
+      properties:
+        terminalCode:
+          $ref: '#/components/schemas/TerminalCode'
+        automaticBatchClose:
+          $ref: '#/components/schemas/AutomaticBatchClose'
+        staticQR:
+          $ref: '#/components/schemas/StaticQR'
+        acceptTip:
+          $ref: '#/components/schemas/AcceptTip'
+        manualEntry:
+          $ref: '#/components/schemas/ManualEntry'
+        promotionsEnabled:
+          $ref: '#/components/schemas/PromotionsEnabled'
+        taxIndicator:
+          $ref: '#/components/schemas/TaxIndicator'
+        taxValue:
+          $ref: '#/components/schemas/TaxValue'
+        merchantCode:
+          $ref: '#/components/schemas/MerchantCode'
+        branchInfo:
+          $ref: '#/components/schemas/BranchInfo'
+
+    MerchantInfo:
+      type: object
+      description: >-
+        Merchant Information object.
+          * `Mandatory` in the TerminalConfiguration body for Terminals V1 APIs.
+      required:
+        - merchantCode
+        - merchantName
+        - mcc
+        - merchantCategoryName
+        - countryCode
+        - merchantCity
+        - fantasyName
+        - documentNumber
+      properties:
+        merchantCode:
+          $ref: '#/components/schemas/MerchantCode'
+        merchantName:
+          type: string
+          description: Merchant trade name.
+          maxLength: 64
+          example: 'CLUB DE GOLF DEL URUGUAY'
+        mcc:
+          type: string
+          description: Identifies the Merchant category code, according to ISO 18245.
+          maxLength: 64
+          example: '6012'
+        merchantCategoryName:
+          type: string
+          description: Merchant category name, according to ISO 18245.
+          maxLength: 32
+          example: 'Financial Institutions'
+        merchantCity:
+          type: string
+          maxLength: 64
+          description: The merchant city.
+          example: 'Montevideo'
+        countryCode:
+          type: string
+          maxLength: 2
+          description: The country code.
+          example: 'UY'
+        documentNumber:
+          type: string
+          maxLength: 16
+          description: The document number.
+          example: '211057310015'
+        fantasyName:
+          type: string
+          maxLength: 64
+          description: The merchant fantasy name.
+          example: 'CLUB DE GOLF - RESTORAN'
+
+    MerchantCode:
+      type: string
+      maxLength: 32
+      description: >-
+        Merchant identifier (according to client systems). 
+          * `Mandatory` in the TerminalsConfiguration body for Terminals V2 APIs.
+      example: '12122'
+
+    BranchInfo:
+      type: object
+      required:
+        - city
+        - department
+        - direction
+        - branchId
+      properties:
+        city:
+          type: string
+          maxLength: 64
+          description: The branch city.
+          example: 'MONTEVIDEO'  
+        department:
+          type: string
+          description: Geographic department where the branch is located.
+          example: 'Montevideo'
+          maxLength: 32
+        direction:
+          type: string
+          description: Direction where the branch is located.
+          example: 'RIVERA 4240'
+          maxLength: 64
+        branchId:
+          type: string
+          description: Branch identifier.
+          example: '002'
+          maxLength: 32
+
+    AutomaticBatchClose:
+      type: boolean
+      description: Flag that indicates if terminal must perform automatic cash closing.
+      example: True or False; default True.
+
+    StaticQR:
+        type: boolean
+        description: Indicates if Terminal accepts static QR.
+        example: True or False; default True.
+
+    AcceptTip:
+        type: boolean
+        description: Flag that indicates if terminal must prompt the user for a tip amount entry.
+        example: True or False;
+
+    ManualEntry:
+        type: boolean
+        description: Indicates if Terminal accepts card holder manual data entry for transaction information.
+        example: True or False;
+
+    PromotionsEnabled:
+        type: boolean
+        description: Indicates if Merchant has any promotions available.
+        example: True or False;
+
+    TerminalCode:
+      type: string
+      description: The terminal identifier.
+      maxLength: 32
+      example: 'X000RV15'
+
+    RequestID:
+      description: The request ID used for tracking the request.
+      type: string
+      example: '0112313546456'
+
+    TerminalIDsList:
+      type: array
+      description: List of enabled terminal IDs.
+      items:
+        $ref: '#/components/schemas/TerminalCode'
+
+    TaxIndicator:
+      type: integer
+      description: >
+         Tax Indicator. The responses for the requests can return the following values on the 'INDI' property:
+          * `0` - No tax deduction
+          * `1` - Return IVA (law #17.934). Tax deductions according to several uruguayan national laws
+          * `2` - Return IMESI (law #18.083). Tax deductions according to several uruguayan national laws
+          * `3` - Return AFAM (law #18.083). Tax deductions according to several uruguayan national laws
+          * `4` - Refund Im
+          * `6` - Financial inclusion law (law #19.210)
+      example: 6
+
+    TaxValue:
+      type: integer
+      description: >
+        Value used for taxed amount calculation. Examples: 0, 10%, 22%
+      example: 22
+
+    ReturnCode:
+      type: string
+      description: >
+        The responses for the requests can return the following values on the 'returnCode' property:
+         * `01` - ok with a warning condition. Check the 'returnDescription' property for more details.
+         * `02` - Terminal code not found in database.
+         * `03` - An error occurred while saving data on the database.
+         * `04` - Merchant not found in database.
+         * `05` - The target terminal was not created by the Terminals Service.
+         * `06` - The target merchant was not created by the Terminals Service.
+         * `07` - A TerminalConfiguration's mandatory field is null or missing.
+      example: "02"
+      enum:
+        - '01'
+        - '02'
+        - '03'
+        - '04'
+        - '05'
+        - '06'
+        - '07'
+
+    TerminalSuccessResponse:
+      type: object
+      required:
+        - request-id
+      properties:
+        request-id:
+          $ref: '#/components/schemas/RequestID'
+
+    RetrieveTerminalConfigResponse:
+      type: object
+      required:
+        - request-id
+      properties:
+        request-id:
+          $ref: '#/components/schemas/RequestID'
+        terminalConfiguration:
+          $ref: '#/components/schemas/TerminalConfigurationV1'
+
+    RetrieveTerminalDetailsResponse:
+      type: object
+      required:
+        - request-id
+      properties:
+        request-id:
+          $ref: '#/components/schemas/RequestID'
+        terminalStatus:
+          $ref: '#/components/schemas/TerminalStatus'
+
+    RetrieveTerminalsResponse:
+      type: object
+      required:
+        - request-id
+        - terminalIdList
+      properties:
+        request-id:
+          $ref: '#/components/schemas/RequestID'
+        terminalIdList:
+          $ref: '#/components/schemas/TerminalIDsList'
+
+    TerminalStatus:
+      type: object
+      properties:
+        creationDate:
+          type: string
+          description: Indicates the timestamp of terminal creation. Indicates the timestamp of terminal creation. Format yyyy-MM-dd HH:mm:ss
+          example: '2017-07-21 17:32:28'
+          maxLength: 24
+        currentBatch:
+          type: string
+          maxLength: 64
+          description: Indicates the current batch number for the terminal.
+          example: '001'
+        currentTraceID:
+          type: string
+          maxLength: 64
+          description: Indicates the current trace ID for the terminal.
+          example: 'The current trace ID.'
+
+    ApiKey:
+      type: string
+      description: The code sent by API Gateway to know which acquirer is originated the request.
+
+    ErrorInfo:
+      type: object
+      required:
+        - returnCode
+        - request-id
+      properties:
+        request-id:
+          $ref: '#/components/schemas/RequestID'
+        timestamp:
+          type: string
+          description: The date-time when the error occurred.
+          example: '2017-07-21T17:32:28Z'
+        returnCode:
+          $ref: '#/components/schemas/ReturnCode'
+        returnDescription:
+          type: string
+          description: Error  description  returned  only  in  error conditions  for  troubleshooting purpose.
+          example: Terminal code not found in database.

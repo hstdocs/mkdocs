@@ -1,0 +1,260 @@
+#
+#  (c) COPYRIGHT 2021 HST EQUIPAMENTOS
+#  ELETRONICOS Ltda, Campinas (SP), Brasil
+#  ALL RIGHTS RESERVED - TODOS OS DIREITOS RESERVADOS
+#  CONFIDENTIAL, UNPUBLISHED PROPERTY OF HST E. E. Ltda
+#  PROPRIEDADE CONFIDENCIAL NAO PUBLICADA DA HST Ltda.
+#
+
+openapi: 3.0.1
+info:
+  title: HST PAYMENTQR - SCHEDULER
+  description: The PaymentQR Scheduler API.
+  version: 1.0.0
+servers:
+  - url: https://homolog-api-gateway.test-teste-prueba.com:9208/scheduler/v1/closure
+    description: 'Homolog'
+  - url: https://URL -pending definition!!.com:9205/scheduler/v1/closure
+    description: 'Production'
+
+paths:
+  /scheduler/v1/ping:
+    get:
+      tags:
+        - Ping Scheculer
+      summary: Sends a ping to verify scheduler health.
+      operationId: SchedulerPing
+      responses:
+        200:
+          description: Ping was successful for all components used by the Scheduler service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PingResponse'
+  /scheduler/v1/closure:
+    post:
+      tags:
+        - Closure Scheduler
+      summary: Sends a closure request and returns the closure status report.
+      operationId: SchedulerClosure
+      parameters:
+        - in: header
+          name: request-id
+          description: The auto generated request ID used for tracking the request.
+          schema:
+            type: string
+          required: true
+        - in: header
+          name: apiKey
+          description: The code sent by API Gateway to know which acquirer has originated the request.
+          schema:
+            type: string
+          required: true
+      requestBody:
+        description: Closing Request, send a list of merchant ids or the code of the terminal you want to close.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClosureRequest'
+        required: true
+
+      responses:
+        200:
+          description: The sucess response model for the Closure request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClosureResponse'
+        500:
+          description: Internal server error. Check the error code and error message for more details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+components:
+  schemas:
+    ClosureRequest:
+      type: object
+      description: Closure Request
+      properties:
+        merchantIdList:
+          type: array
+          description: List of merchant ids you want to include in the closing request.
+          items:
+            type: integer
+            format: int64
+          example: [10,20,30,40]
+        terminalCode:
+          type: string
+          description: Code of the terminal you want to close.
+          example: 'X000AS56'
+          maxLength: 8
+    ClosureResponse:
+      type: object
+      description: Closure Response
+      properties:
+        acquirerCode:
+          type: string
+        closureDetails:
+          $ref: '#/components/schemas/ClosureDetail'
+
+    ClosureDetail:
+      type: object
+      description: Closing Request Details
+      properties:
+        closureBy:
+          type: string
+        numberOfSuccessfulMerchants:
+          type: integer
+          format: int64
+        numberOfFailedMerchants:
+          type: integer
+          format: int64
+        successfulMerchantList:
+          type: array
+          items:
+            $ref: "#/components/schemas/MerchantClosureResult"
+        failedMerchantList:
+          type: array
+          items:
+            $ref: "#/components/schemas/MerchantClosureResult"
+
+    MerchantClosureResult:
+      type: object
+      description: >-
+        Details of the result of closing a merchant, including the listing of the results of closing the terminals
+      properties:
+        qrMerchantTO:
+          $ref: "#/components/schemas/Merchant"
+          description: Object Merchant Information
+        totalNumberOfTransactionsRestrained:
+          description: Total number of transactions restricted during the closing process
+          type: integer
+          format: int32
+          example: 0
+        numberOfTerminalSuccess:
+          description: Total number of transactions succeed during the closing process
+          type: integer
+          format: int32
+          example: 3
+        numberOfTerminalFailed:
+          type: integer
+          description: Total number of endpoints that failed during the closure process
+          format: int32
+          example: 0
+        batchUploadNumber:
+          type: integer
+          format: int64
+          example: 20
+        terminalResultList:
+          description: List with detailed results of terminal closures
+          type: array
+          items:
+            $ref: "#/components/schemas/TerminalClosureResult"
+
+    TerminalClosureResult:
+      type: object
+      description: Details of a terminal closing result.
+      properties:
+        idBranch:
+          description: Branch identifier
+          example: 5
+          type: integer
+          format: int64
+        branchCode:
+          description: Unique code for a terminal on your merchant.
+          example: 'X000AS56'
+          type: string
+        numberOfTransactionsRestrained:
+          description: Number of transactions restricted during closing.
+          example: 0
+          type: integer
+          format: int32
+        numberOfTransactionsClosed:
+          description: Number of transactions closed during closing.
+          example: 5
+          type: integer
+          format: int32
+        neededBatchUpload:
+          description: Indicating that a batch upload is required when it is Close By Difference.
+          example: false
+          type: boolean
+        hasSuccess:
+          type: boolean
+          description: Indicates successful terminal closing.
+          example: true
+
+    Merchant:
+      type: object
+      description: Object with merchant information
+      properties:
+        idMerchant:
+          description: Merchant Identifier
+          type: integer
+          format: int64
+          example: 12
+        dtLastUpdate:
+          description: Indicates the timestamp of last update date. Format yyyy-MM-dd HH:mm:ss
+          example: '2017-07-21 17:32:28'
+          type: string
+        dtCreation:
+          description: Indicates the timestamp of creation merchant date. Format yyyy-MM-dd HH:mm:ss
+          example: '2017-07-21 17:32:28'
+          type: string
+        dsMerchantCode:
+          description: Merchant Code
+          type: string
+          example: '00003123'
+        dsFantasyName:
+          description: Fantasy name
+          type: string
+          example: 'CUATROASES'
+        dsBusinessName:
+          description: Business Name
+          type: string
+          example: 'LOS 4 ASES S.A.'
+        nbMerchantCategoryCode:
+          description: Merchant Category Code
+          type: string
+          example: '5611'
+        dsDocumentNumber:
+          description: Document Number
+          type: string
+          example: '210202020010'
+    Error:
+      type: object
+      description: API Generic Error Response Object
+      properties:
+        message:
+          description: Error message description
+          type: string
+        code:
+          description: Error code
+          type: integer
+          format: int32
+      example:
+        message: Terminal code not found in database.
+        code: 500
+
+    PingResponse:
+      type: object
+      description: Ping response
+      properties:
+        schedulerStatus:
+          description: >
+            Scheduler service status based on the status of components used by the Scheduler API. 'schedulerStatus return types:
+             * `OK` - Returns ok if all components return ping success.
+             * `Failed` - Return if during the ping, any component is unable to successfully communicate.
+          type: string
+          example: 'OK'
+        itmConnection:
+          description: Communication status with ITM
+          type: boolean
+        databaseConnection:
+          description: Communication status with Database
+          type: boolean
+          example: true
+        cryptoManagerConnection:
+          description: Communication status with CryptoServer
+          type: boolean
+          example: true

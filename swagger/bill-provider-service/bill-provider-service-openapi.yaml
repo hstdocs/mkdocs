@@ -1,0 +1,363 @@
+#
+#  (c) COPYRIGHT 2022 HST EQUIPAMENTOS
+#  ELETRONICOS Ltda, Campinas (SP), Brasil
+#  ALL RIGHTS RESERVED - TODOS OS DIREITOS RESERVADOS
+#  CONFIDENTIAL, UNPUBLISHED PROPERTY OF HST E. E. Ltda
+#  PROPRIEDADE CONFIDENCIAL NAO PUBLICADA DA HST Ltda.
+#
+
+openapi: 3.0.3
+info:
+  title: HST PaymentQR - Bill Provider Service
+  description: The PaymentQR Bill Provider API.
+  version: 1.2.0.0
+servers:
+  - url: https://homolog-api-gateway.test-teste-prueba.com:9208/v1/billprovider/{TerminalCode}/bills
+    description: 'Homolog'
+  - url: https://URL -pending definition!!.com:9205/v1/billprovider/{TerminalCode}/bills
+    description: 'Production'
+
+paths:
+  /v1/billprovider/ping:
+    get:
+      tags:
+        - Ping Bill Provider Service
+      summary: Sends a ping to verify bill provider service health.
+      operationId: BillProviderServicePing
+      responses:
+        200:
+          description: Success.
+
+  /v1/billprovider/{terminalCode}/bills/current:
+    post:
+      tags:
+        - Bills
+      summary: Returns the details related to the current purchase transaction for the terminal.
+      operationId: retrieveCurrentBill
+      parameters:
+        - in: header
+          name: request-id
+          description: The auto generated request ID used for tracking the request.
+          schema:
+            type: string
+          required: true
+        - in: path
+          name: terminalCode
+          schema:
+            $ref: '#/components/schemas/TerminalCode'
+          required: true
+      requestBody:
+        description: Information about the card used to perform the transaction.
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BillProviderRequest'
+      responses:
+        200:
+          description: The success response model for the retrieve the current purchase transaction for the terminal.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrieveBillResponse'
+        401:
+          description: Unauthorized access.
+        500:
+          description: Internal server error. Check the returnCode and returnMessage for more details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorInfo'
+
+  /v1/billprovider/{terminalCode}/bills/{purchaseId}:
+    post:
+      tags:
+        - Bills
+      summary: Returns the details related to the purchase ID indicated in the invocation.
+      operationId: retrieveSpecificBill
+      parameters:
+        - in: header
+          name: request-id
+          description: The auto generated request ID used for tracking the request.
+          schema:
+            type: string
+          required: true
+        - in: path
+          name: purchaseId
+          schema:
+            $ref: '#/components/schemas/PurchaseID'
+          required: true
+        - in: path
+          name: terminalCode
+          schema:
+            $ref: '#/components/schemas/TerminalCode'
+          required: true
+      requestBody:
+        description: Information about the card used to perform the transaction.
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BillProviderRequest'
+      responses:
+        200:
+          description: The sucess response model for the retrieve the current purchase transaction for the terminal.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrieveBillResponse'
+        401:
+          description: Unauthorized access.
+        500:
+          description: Internal server error. Check the returnCode and returnMessage for more details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorInfo'
+ 
+components:
+  schemas:
+    AcquirerCode:
+      type: string
+      description: The acquirer code to know which acquirer is originated the request.
+
+    MerchantBillId:
+      type: string
+      description: Value to identify the current invoice at the merchant.
+
+    RequestID:
+      description: The request ID used for tracking the request.
+      type: string
+      example: '0112313546456'
+
+    PurchaseID:
+      description: Purchase identifier.
+      type: string
+      example: '123456789'
+
+    TerminalCode:
+      type: string
+      description: The terminal identifier.
+      maxLength: 32
+      example: 'X000RV15'
+
+    ErrorInfo:
+      type: object
+      required:
+        - returnCode
+        - request-id
+      properties:
+        requestId:
+          $ref: '#/components/schemas/RequestID'
+        timestamp:
+          type: string
+          description: The date-time when the error occurred.
+          example: '2017-07-21T17:32:28Z'
+        responseCodes:
+          $ref: '#/components/schemas/ResponseCode'
+
+    CardType:
+      type: string
+      description: 'Identifies the card type used in the transaction. Possible values are: “DEBIT”, “CREDIT”, "PRE_PAID".'
+      enum:
+        - 'DEBIT'
+        - 'CREDIT'
+        - 'PRE_PAID'
+      example: 'DEBIT'
+
+    CardDetails:
+      type: object
+      required:
+        - cardType
+        - issuerBank
+        - issuerCountry
+      description: >
+        The rationale behind this requirement is that Merchant needs to know with card was used by Cardholder to implement promotions; e.g.,
+        discounts based on a specific Bank, etc.
+      properties:
+        cardType:
+          $ref: '#/components/schemas/CardType'
+        issuerBank:
+          $ref: '#/components/schemas/IssuerBank'
+        issuerCountry:
+          type: string
+          description: Indicates the country of the issuer. At least if it is local or not.
+          minLength: 0
+          maxLength: 64
+          example: 'UY'
+        PANLast4:
+          type: string
+          description: Identifies the last 4 digits of the card used in the transaction.
+          minLength: 0
+          maxLength: 4
+          example: '9999'
+        tokenLast4:
+          type: string
+          description: Identifies the last 4 digits of the token (digital account number) used in the transaction.
+          minLength: 0
+          maxLength: 4
+          example: '9999'
+
+    IssuerBank:
+      type: object
+      required:
+        - name
+        - bin
+      description: >
+        Issuer bank responsible for the transaction.
+      properties:
+        name:
+          type: string
+          description: This field indicates the card issuer.
+          minLength: 0
+          maxLength: 32
+          example: 'ITAU PAY UY'
+        bin:
+          type: string
+          description: Card BIN used in the transaction.
+          minLength: 0
+          maxLength: 8
+          example: '99999999'
+
+    ReturnCode:
+      type: string
+      description: >
+        The responses for the requests can return the following values on the 'returnCode' property:
+         * `00` - Ok
+         * `01` - ok with a warning condition. Check the 'returnDescription' property for more details
+         * `02` - Terminal code not found in database.
+         * `03` - An error occurred while saving data on the database.
+         * `04` - Merchant not found in database.
+         * `05` - The target terminal was not created by the Terminals Service.
+         * `06` - An internal server error has occurred. Check the 'returnDescription' property for more details.
+         * `07` - Purchase was not found on the acquirer from the requested purchase id.
+         * `08` - Database error.
+         * `09` - Terminal is not enabled for promotions.
+      enum:
+        - '00'
+        - '01'
+        - '02'
+        - '03'
+        - '04'
+        - '05'
+        - '06'
+        - '07'
+        - '08'
+        - '09'
+      example: '02'
+
+    RetrieveBillResponse:
+      allOf:
+        - $ref: '#/components/schemas/BasicSuccessResponse'
+        - type: object
+          description: Object that contains the response data regarding the bill service
+          required:
+            - transactionData
+          properties:
+            billPromotionMessage:
+              type: string
+              description: Message to display transaction data in html format.
+              example: '<html>example for promotion message</html>'
+            noPromotionsPresent:
+              type: boolean
+              description: Flag to indicate if the promotion is enabled on the bill.
+              example: true
+            timeout:
+                type: integer
+                description: Value in milliseconds that defines the time to re-execute the request.
+                example: 30
+            waitingMessage:
+                type: string
+                description: Message to display a waiting message in html format.
+                example: '<html>example for waiting message</html>'
+            merchantBillId:
+                  type: string
+                  description: Merchant unique bill identifier value.
+                  example: '123019'
+            transactionData:
+              $ref: '#/components/schemas/TransactionData'
+            responseCodes:
+              $ref: '#/components/schemas/ResponseCode'
+
+    BillProviderRequest:
+      type: object
+      description: Basic object for request
+      properties:
+        acquirerCode:
+          $ref: '#/components/schemas/AcquirerCode'
+        merchantBillId:
+          $ref: '#/components/schemas/MerchantBillId'
+        cardDetails:
+          description: Card details to check if it is able to enable promotion.
+          required: false
+          $ref: '#/components/schemas/CardDetails'
+
+    ResponseCode:
+      type: object
+      description: Basic object to represent the response code
+      properties:
+        id:
+          type: string
+          description: Response Code Identifier.
+          example: '12'
+        code:
+          type: string
+          description: Enum description for Response code.
+          example: 'NO_DATA_ABORT_TRANSACTION'
+
+    BasicSuccessResponse:
+      type: object
+      description: Basic object for return on success
+      required:
+        - requestId
+      properties:
+        requestId:
+          $ref: '#/components/schemas/RequestID'
+        returnCode:
+          type: string
+          description: Default value for successful response.
+          example: '00'
+
+    TransactionData:
+      type: object
+      required:
+        - purchaseID
+        - currency
+        - amount
+      description: Object containing the transaction details
+      properties:
+        purchaseID:
+          type: string
+          description: 'Unique identifier that indicates the Purchase associated to a transaction. This ID is generated by the Client. (TLV 80-07).'
+          maxLength: 64
+          example: '130900'
+        currency:
+          type: string
+          description: 'This field indicates the currency code used in the transaction, according to ISO 4217. For example: 840 for US Dollars, 986 for Brazilian Reais, 858 for Uruguayan Pesos. (TLV 53).'
+          maxLength: 3
+          example: '840'
+        amount:
+          type: string
+          description: 'This field indicates the transaction amount, including 2 decimal points. For example: $123.45 will be represented as 12345. (TLV 54 and TLV 80-03).'
+          maxLength: 16
+          example: '12345'
+        taxDeductionIndicator:
+          type: string
+          description: 'Tax deduction indicator. (Known as INDI in Uruguay). (TLV 80-02).'
+          maxLength: 2
+          example: '1'
+        taxBaseAmount:
+          type: string
+          description: 'This field indicates the transaction amount without taxes, including 2 decimal points. For example: $12.34 will be represented as 1234. Known as Monto gravado in Uruguay. (TLV 80-04).'
+          maxLength: 16
+          example: '1234'
+        installments:
+          type: string
+          description: 'Number of installments for the transaction. (TLV 80-01).'
+          maxLength: 2
+          example: '1'
+        plan:
+          type: string
+          description: 'Merchant plan used for the transaction. 0 for common purchases 1 for gas station purchases 2 for mini-market purchases. (TLV 80-05).'
+          maxLength: 1
+          example: '1'

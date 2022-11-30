@@ -1,0 +1,388 @@
+openapi: 3.0.1
+info:
+  title: PaymentQR Recover Data Service
+  description: 'The PaymentQR Recover Data Service'
+  version: 1.0.0
+servers:
+  - url: https://homolog-api-gateway.test-teste-prueba.com:9208
+
+paths:
+  /recoverdata/v1/{terminalCode}/transactionList:
+    get:
+      tags:
+        - TransactionList
+      summary: Get list of transactions.
+      operationId: TransactionList
+      parameters:
+        - in: path
+          name: terminalCode
+          description: The terminal code
+          schema:
+            type: string
+          required: true
+          example: 'X000RV15'
+        - in: header
+          name: request-id
+          description: The auto generated request ID used for tracking the request.
+          schema:
+            type: string
+          required: true
+        - in: header
+          name: apikey
+          description: The code sent by API Gateway to know which acquirer has originated the request.
+          schema:
+            type: string
+          required: true
+        - in: query
+          name: pageLength
+          schema:
+            $ref: '#/components/schemas/PageLength'
+        - in: query
+          name: index
+          schema:
+            $ref: '#/components/schemas/Index'
+        - in: query
+          name: recordsLimit
+          schema:
+            $ref: '#/components/schemas/RecordsLimit'
+        - in: query
+          name: orderBy
+          schema:
+            $ref: '#/components/schemas/OrderBy'
+        - in: query
+          name: orderByDirection
+          schema:
+            $ref: '#/components/schemas/OrderByDirection'
+        - in: query
+          name: startDateTime
+          schema:
+            $ref: '#/components/schemas/StartDateTime'
+        - in: query
+          name: endDateTime
+          schema:
+            $ref: '#/components/schemas/EndDateTime'
+        - in: query
+          name: currencyCode
+          schema:
+            $ref: '#/components/schemas/Currency'
+        - in: query
+          name: transactionStatus
+          schema:
+            $ref: '#/components/schemas/TransactionStatus'
+        - in: query
+          name: transactionType
+          schema:
+            $ref: '#/components/schemas/TransactionType'
+        - in: query
+          name: digitalAccount
+          schema:
+            $ref: '#/components/schemas/DigitalAccount'
+        - in: query
+          name: transactionID
+          schema:
+            $ref: '#/components/schemas/TransactionID'
+      responses:
+        200:
+          description: The transaction list response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionListResponse'
+        400:
+          description: Bad Request. Check the returnCode and returnMessage for more details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorInfo'
+        401:
+          description: Unauthorized access.
+        500:
+          description: Internal server error. Check the returnCode and returnMessage for more details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorInfo'
+components:
+  schemas:
+    PageLength:
+      description: Number of records to return each page
+      type: integer
+      format: int32
+      example: 100
+    Index:
+      description: Index for page
+      type: integer
+      format: int32
+      example: 1
+    RecordsLimit:
+      description: Number of records to return all data
+      type: integer
+      format: int64
+      example: 1000
+    OrderBy:
+      description: >
+        Column name to order by. Possible columns to order by: transactionAmount, timestamp, authorizationDateTime,
+        issuerName, issuerBin, country, cardType, plan, ticket, billNumber, batchNumber, indi, auditNumber, responseCode.
+      type: string
+      example: "transactionID"
+    OrderByDirection:
+      description: Direction to order by (ASC - ascendant, DESC - descending)
+      type: string
+      example: "DESC"
+    StartDateTime:
+      description: The initial datetime to filter transactions by timestamp, following GMT format yyyy-mm-dd hh-mm-ss.SSS.
+      type: string
+      example: "2021-10-22 18:22:57.425"
+    EndDateTime:
+      description: The final datetime to filter transactions by timestamp, following GMT format yyyy-mm-dd hh-mm-ss.SSS.
+      type: string
+      example: "2021-12-01T10:07:21:07:00"
+    MinAmount:
+      description: The minimum amount to filter transactions by transactionAmount
+      type: string
+      example: "100"
+    MaxAmount:
+      description: The maximum amount to filter transactions by transactionAmount
+      type: string
+      example: "500"
+    Currency:
+      description: Filter by the transaction currency in ISO 4217 format
+      type: string
+      example: "858"
+    TransactionStatus:
+      description: >
+        Integer value representing the Transaction Status by HST. Values can be:
+         * `1` - APPROVED.
+         * `2` - REVERTED.
+         * `3` - DENIED.
+         * `4` - RETURNED.
+         * `5` - NULLIFIED.
+         * `6` - CLOSED.
+         * `98` - INCOMPLETE.
+         * `99` - UNKNOWN.
+      type: integer
+      example: "1"
+    DigitalAccount:
+      description: Filter by the last 4 digits of the digital account (token) used in the transaction
+      type: string
+      example: "1145"
+    TransactionID:
+      description: Filter by the transaction id.
+      type: string
+      example: "7839"
+    TransactionListResponse:
+      type: object
+      required:
+        - request-id
+        - transactionList
+      description: The transaction list response.
+      properties:
+        request-id:
+          type: string
+          description: The same request-id as request parameter.
+          example: '0112313546456'
+        transactionList:
+          type: array
+          items:
+            $ref: '#/components/schemas/TransactionData'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+    TransactionData:
+      type: object
+      properties:
+        terminalCode:
+          type: string
+          description: Terminal Identification (unique)
+          example: "X17RCP01"
+        transactionID:
+          type: string
+          description: Unique transaction identifier generated by HST for the transaction.
+          example: "7839"
+        transactionStatus:
+          $ref: '#/components/schemas/TransactionStatus'
+        acquirerTransactionID:
+          type: string
+          description: Acquirer transaction ID (ISO8583 field 37) for the transaction.
+          example: "158159160"
+        networkTransactionID:
+          type: string
+          description: Network transaction Identifier (ISO8583 field 62.2) generated by the Brand for the transaction.
+          example: "161162163"
+        transactionType:
+          $ref: '#/components/schemas/TransactionType'
+        responseCode:
+          type: string
+          description: The transaction response code (Field 39 ISO 8583)
+          example: "00"
+        auditNumber:
+          type: string
+          description: The system trace audit number (STAN) (Field 11 ISO 8583)
+          example: "00064"
+        currency:
+          type: string
+          description: The transaction currency in ISO 4217 format
+          example: "858"
+        transactionAmount:
+          type: string
+          description: This field indicates the transaction amount, including 2 decimal points ($123.45 will be represented as "12345")
+          example: "12345"
+        tip:
+          type: string
+          description: This field indicates the transaction tip, including 2 decimal points ($12.34 will be represented as "1234")
+          example: "1234"
+        taxReductionAmount:
+          type: string
+          description: This field indicates the tax reduction amount, including 2 decimal points ($123.45 will be represented as "12345")
+          example: "12345"
+        installments:
+          type: string
+          description: Number of installments
+          example: "02"
+        plan:
+          type: string
+          description: Transaction plan
+          example: "0"
+        indi:
+          type: string
+          description: Tax reduction law indicator
+          example: "06"
+        batchNumber:
+          type: string
+          description: Batch number associated to the terminal while performing this transaction.
+          example: "012345"
+        authorizationCode:
+          type: string
+          description: Transaction authorization code (Field 38 ISO 8583).
+          example: "123456"
+        authorizationDateTime:
+          type: string
+          description: "Transaction authorization date and time. Format: yyyy-MM-ddTHH:mm:ss.SSSZ (ISO 8601)"
+          example: "2021-12-01T09:07:21:07:00"
+        billNumber:
+          type: string
+          description: Transaction bill number.
+          example: "012345"
+        ticket:
+          type: string
+          description: Indicates the ticket associated to the transaction
+          example: "4567"
+        merchantName:
+          type: string
+          description: Merchant trade name related to the terminal.
+          example: CLUB DE GOLF - RESTORAN
+        merchantCode:
+          type: string
+          description: Merchant identifier
+          example: 020416570010000
+        deferredMonths:
+          type: string
+          description: Indicates the deferred months.
+          example: "0"
+        digitalAccount:
+          type: string
+          description: Indicates the last 4 digits of the digital account (token) used in the transaction
+          example: "4567"
+        cardDetails:
+          $ref: '#/components/schemas/CardDetails'
+        timestamp:
+          type: integer
+          format: int64
+          description: Indicates the transaction GMT timestamp in milliseconds.
+          example: "1634926977425"
+    CardDetails:
+      type: object
+      properties:
+        cardType:
+          type: string
+          description: Card type (DEBIT/CREDIT)
+          example: "CREDIT"
+        issuerName:
+          type: string
+          description: The issuer name
+          example: "Bank of bravos"
+        issuerBin:
+          type: integer
+          format: int64
+          description: The issuer bin
+          example: 11132
+        country:
+          type: string
+          description: Country code
+          example: "UY"
+    Pagination:
+      type: object
+      properties:
+        currentIndex:
+          type: integer
+          format: int32
+          description: Current page index
+          example: 2
+        numberOfElementsCurrentPage:
+          type: integer
+          format: int64
+          description: Number of elements on the current page
+          example: 10
+        totalPages:
+          type: integer
+          format: int64
+          description: Total number of pages
+          example: 10
+        numberOfTotalElements:
+          type: integer
+          format: int64
+          description: Number of elements on total
+          example: 100
+    ErrorInfo:
+      type: object
+      required:
+        - request-id
+        - timestamp
+      properties:
+        request-id:
+          type: string
+          description: The auto generated request ID used for tracking the request.
+        timestamp:
+          type: string
+          description: The date-time when occurred the error.
+        returnCode:
+          $ref: '#/components/schemas/ReturnCode'
+        returnDescription:
+          type: string
+          description: Returns the description when any of the warnings (200 HTTP Response) or error (500 HTTP Response) occurs.
+      example:
+        request-id: '0112313546456'
+        timestamp: '2017-07-21T17:32:28Z'
+        returnCode: '02'
+        returnDescription: Terminal code not found in database.
+    ReturnCode:
+      type: string
+      description: >
+        The returnCode for the requests to HST Transaction can return the following values on the 'returnCode' property:
+         * `01` - Ok with a warning condition. Check the 'returnDescription' property for more details.
+         * `02` - Specific record not found in database. Check the 'returnDescription' property for more details.
+      enum:
+        - '01'
+        - '02'
+    TransactionType:
+      type: integer
+      format: int16
+      description: >
+        Integer value representing the Transaction Type by HST. Values can be:
+          * `1` - Purchase transaction carried out online.
+          * `2` - Devolution transaction carried out online.
+          * `3` - Annulment transaction carried out online.
+          * `4` - Purchase transaction carried out offline.
+          * `5` - Devolution transaction carried out offline.
+          * `6` - Annulment transaction carried out offline.
+          * `7` - Reverted purchase transaction.
+          * `8` - Reverted devolution transaction.
+          * `9` - Reverted annulment transaction.
+          * `10` - Terminal close transaction.
+          * `11` - Batch upload transaction of a purchase.
+          * `12` - Batch upload transaction of a devolution.
+          * `13` - Batch upload transaction of a annulment.
+          * `14` - A purchase adjustment transaction.
+          * `15` - Transaction that indicates closing for difference.
+          * `16` - ECommerce purchase transaction carried out online.
+          * `17` - DAG purchase transaction carried out online.
+      example: 1

@@ -1,0 +1,1179 @@
+#
+#  (c) COPYRIGHT 2021 HST EQUIPAMENTOS
+#  ELETRONICOS Ltda, Campinas (SP), Brasil
+#  ALL RIGHTS RESERVED - TODOS OS DIREITOS RESERVADOS
+#  CONFIDENTIAL, UNPUBLISHED PROPERTY OF HST E. E. Ltda
+#  PROPRIEDADE CONFIDENCIAL NAO PUBLICADA DA HST Ltda.
+#
+
+openapi: 3.0.3
+info:
+  title: HST PaymentQR - Transaction
+  description: The PaymentQR Transaction Documentation.
+  version: 1.0.0
+  
+servers:
+  - url: 'http://localhost:8700'
+    description: PaymentQR Local
+  - url: "http://172.21.121.5:8080"
+    description: PaymentQR Sandbox
+  - url: "https://homolog-api-gateway.test-teste-prueba.com:9208"
+    description: PaymentQR Homolog
+
+paths:
+  /transaction/v1/ping:
+    get:
+      tags:
+        - Transaction
+      summary: Exposes a API health check endpoint and validate connection with database, crypto manager and ITM.
+      operationId: ping
+      responses:
+        "200":
+          description: Success.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        "500":
+          description: Internal Server Error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+                
+  /transaction/v1/devolution:
+    post:
+      tags:
+        - Transaction
+      summary: Exposes an API for Android purchase devolution
+      operationId: devolutionTransaction
+      parameters:
+        - in: header
+          name: request-id
+          description: The auto generated request identifier used for tracking the request.
+          schema:
+            type: string
+          required: false
+      requestBody:
+        description: The devolution request object.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DevolutionRequest'
+        required: true
+      responses:
+        200:
+          description: The devolution response. 
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DevolutionResponse'
+        400:
+          description: Bad request. Check the message for more details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        500:
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+          
+  
+  /transaction/v1/annulment:
+    post:
+      tags:
+        - Transaction
+      summary: Exposes an API for Android purchase annulment
+      operationId: annulmentTransaction
+      parameters:
+        - in: header
+          name: request-id
+          description: The auto generated request identifier used for tracking the request.
+          schema:
+            type: string
+          required: false
+      requestBody:
+        description: The AnnulmentRequest object.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AnnulmentRequest'
+        required: true
+      responses:
+        201:
+          description: Created. 
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnnulmentResponse'
+        400:
+          description: Bad request. Check the message for more details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        500:
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+  
+  /transaction/v1/purchase:
+    post:
+      tags:
+        - Transaction
+      summary: Exposes an API for Android purchases
+      operationId: purchaseTransaction
+      parameters:
+        - in: header
+          name: request-id
+          description: The auto generated request identifier used for tracking the request.
+          schema:
+            type: string
+          required: false
+        - in: header
+          name: apiKey
+          schema:
+            $ref: '#/components/schemas/ApiKey'
+          required: true
+      requestBody:
+        description: The QrPurchaseRequest object.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QrPurchaseRequest'
+        required: true
+      responses:
+        201:
+          description: Created. 
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QrPurchaseResponse'
+        400:
+          description: Bad request. Check the message for more details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        500:
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+                
+  /transaction/v1/dag/purchase:
+    post:
+      tags:
+       - Transaction
+      summary: Exposes an API for iOS purchases through DAG.
+      operationId: dagPurchaseTransaction
+      parameters:
+        - in: header
+          name: request-id
+          description: The auto generated request identifier used for tracking the request.
+          schema:
+            type: string
+          required: true
+        - in: header
+          name: apiKey
+          schema:
+            $ref: '#/components/schemas/ApiKey'
+          required: true
+      requestBody:
+        description: The DagPurchaseRequest object.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DagPurchaseRequest'
+        required: true
+      responses:
+        201:
+          description: Created. 
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DagPurchaseResponse'
+        400:
+          description: Bad request. Check the message for more details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        500:
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+
+  /transaction/v1/ecommerce/purchase:
+    post:
+      tags:
+      - Transaction
+      summary: Exposes an API for ECommerce purchases.
+      operationId: eCommPurchase 
+      parameters:
+        - in: header
+          name: request-id
+          description: The auto generated request identifier used for tracking the request.
+          schema:
+            type: string
+          required: true
+        - in: header
+          name: apiKey
+          schema:
+            $ref: '#/components/schemas/ApiKey'
+          required: true
+      requestBody:
+        description: The EcommPurchaseRequest object.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EcommPurchaseRequest'
+        required: true
+      responses:
+        201:
+          description: Created. 
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EcommPurchaseResponse'
+        400:
+          description: Bad request. Check the message for more details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        500:
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+                
+  /transaction/v1/{terminalCode}/cancel:
+    post:
+      tags:
+        - Cancel
+      summary: Cancel the transaction.
+      operationId: Cancel
+      parameters:
+        - in: path
+          name: terminalCode
+          description: The terminal code
+          schema:
+            type: string
+          required: true
+          example: 'X000RV15'
+        - in: header
+          name: request-id
+          description: The auto generated request ID used for tracking the request.
+          schema:
+            type: string
+          required: true
+        - in: header
+          name: apikey
+          description: The code sent by API Gateway to know which acquirer has originated the request.
+          schema:
+            type: string
+          required: true
+      requestBody:
+        description: The TransactionIdsRequest model filled correctly, specify just one of them.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransactionIdsRequest'
+      responses:
+        200:
+          description: The cancel response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CancelResponse'
+        400:
+          description: Bad Request. Check the returnCode and returnMessage for more details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        401:
+          description: Unauthorized access.
+        500:
+          description: Internal server error. Check the returnCode and returnMessage for more details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+                
+  /transaction/v1/{terminalCode}/refund:
+    post:
+      tags:
+        - Refund
+      summary: Refund the transaction.
+      operationId: Refund
+      parameters:
+        - in: path
+          name: terminalCode
+          description: The terminal code
+          schema:
+            type: string
+          required: true
+          example: 'X000RV15'
+        - in: header
+          name: request-id
+          description: The auto generated request ID used for tracking the request.
+          schema:
+            type: string
+          required: true
+        - in: header
+          name: apikey
+          description: The code sent by API Gateway to know which acquirer has originated the request.
+          schema:
+            type: string
+          required: true
+      requestBody:
+        description: The TransactionIdsRequest model filled correctly, specify just one of them.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransactionIdsRequest'
+      responses:
+        200:
+          description: The refund response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RefundResponse'
+        400:
+          description: Bad Request. Check the returnCode and returnMessage for more details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorInfo'
+        401:
+          description: Unauthorized access.
+        500:
+          description: Internal server error. Check the returnCode and returnMessage for more details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorInfo'              
+        
+components:
+  schemas:
+    BaseRequest:
+        type: object
+        description: A Base request.
+        properties:
+          requestID:
+            type: string
+            description: Unique request identifier generated for each request by HST.
+            example: '23asd45d1'
+          institutionCode:
+            type: string
+            description: A code generated by HST that identifies the Issuer during the request.
+            example: 'HST-123'
+            
+    RequestID:
+      type: string
+      description: Unique request identifier generated for each request by HST.
+      example: '23asd45d1'
+      
+    InstitutionCode:
+      type: string
+      description: A code generated by HST that identifies the Issuer during the request.
+      example: 'HST-123'
+            
+    BaseResponse:
+        type: object
+        description: A Base response.
+        properties:
+          requestID:
+            type: string
+            example: '281938172'
+          institutionCode:
+            type: string
+            example: 'HST-123'
+          returnMessage:
+            type: object
+            description: The Return Message.
+            allOf:
+                - $ref: '#/components/schemas/ReturnMessage'
+                
+    ApiKey:
+      type: string
+      description: The code sent by API Gateway to know which acquirer is originated the request.
+  
+    DevolutionRequest: 
+      type: object
+      properties: 
+        requestID:
+          type: string
+          description: Unique request identifier generated for each request by HST.
+          example: '23asd45d1'
+        institutionCode:
+          type: string
+          description: A code generated by HST that identifies the Issuer during the request.
+          example: 'HST-123'
+        merchantID:
+          type: integer
+          format: int64
+          description: Unique Merchant identifier.
+          example: 12122
+        qrDeviceID:
+          type: integer
+          format: int64
+          description: Unique Device identifier.
+          example: 34802
+        acquirerID:
+          type: integer
+          format: int64
+          description: Unique Acquirer identifier.
+          example: 11
+        acquirerSpecific:
+          type: object
+          properties:
+            dateSystem: 
+              type: string
+              example: "090720132633"
+            transactionID: 
+              type: integer
+              format: int64
+              example: 314493
+      
+    AnnulmentRequest: 
+      type: object
+      properties: 
+        requestID:
+          type: string
+          description: Unique request identifier generated for each request by HST.
+          example: '23asd45d1'
+        institutionCode:
+          type: string
+          description: A code generated by HST that identifies the Issuer during the request.
+          example: 'HST-123'
+        merchantID:
+          type: integer
+          format: int64
+          description: Unique Merchant identifier.
+          example: 12122
+        qrDeviceID:
+          type: integer
+          format: int64
+          description: Unique Device identifier.
+          example: 34802
+        acquirerID:
+          type: integer
+          format: int64
+          description: Unique Acquirer identifier.
+          example: 11
+        acquirerSpecific:
+          type: object
+          properties:
+            dateSystem: 
+              type: string
+              example: "090720132633"
+            transactionID: 
+              type: integer
+              format: int64
+              example: 314493
+          
+    AnnulmentResponse:
+      type: object
+      properties:
+        transactionMessage: 
+          $ref: '#/components/schemas/TransactionMessage'
+        transactionNumber:
+          type: string
+          
+    DevolutionResponse:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+        - type: object
+      properties:
+        transactionMessage: 
+          $ref: '#/components/schemas/TransactionMessage'
+        transactionNumber:
+          type: string
+  
+    ReturnMessage:
+      type: object
+      properties:
+        returnCode:
+          type: integer
+          description: The responses for Transaction requests.
+          example: 1
+        returnMessage: 
+          type: string
+          
+    EcommPurchaseRequest:
+      type: object
+      description: Ecomm Purcharse Request for Transaction.
+      properties:
+        token:
+          type: string
+          example: '4452378010003593'
+          description: 'NA'
+        ctavvCryptogram:
+          type: string
+          example: 'AgAAAAAABL+BGLWZQr8IQV0AAAA\u003d'
+          description: 'NA'
+        expirationDate:
+          $ref: '#/components/schemas/ExpirationDate'
+        merchQRCodeData:
+          $ref: '#/components/schemas/MerchQRCodeData'
+        deviceId:
+          $ref: '#/components/schemas/DeviceId'
+        cardType:
+          $ref: '#/components/schemas/CardType'
+        dateSystem:
+          $ref: '#/components/schemas/DateSystem'
+        cardDetails:
+          $ref: '#/components/schemas/CardDetails'
+    
+    DagPurchaseRequest:
+      type: object
+      description: Dag Purchase Request for Transaction.
+      properties:
+        institutionCode:
+            type: string
+            description: A code generated by HST that identifies the Issuer during the request.
+            example: 'HST-123'
+        amount:
+          type: string
+          description: 'Amount of the transaction. Including 2 decimal places.'
+          example: '2.24'
+        dateTime: 
+          type: string
+          description: 'Transaction date and time in (MMddHHmmss) format.'
+          example: '0312145237'
+        idAcquirer: 
+          type: string
+          description: 'The acquirer identifier'
+          example: 'uy.com.vnet'
+        qrType:
+          $ref: '#/components/schemas/QrType'
+        track2:
+          type: string
+          description: 'Track 2 Data (NFC Token Data).'
+          example: '4452378550002500D2512201000000000000'
+        idTerminal:
+          type: string
+          description: 'Terminal Identifier.'
+          example: 'X0LG6P01'
+        idDevice:
+          type: string
+          description: The device unique identifier.
+          example: '15331'
+        branchId:
+          type: string
+          description: 'The branch identifier.'
+          example: '001'
+        merchantCode:
+          type: string
+          description: 'Merchant identifier (according to client systems).'
+          example: '01000753'
+        indi:
+          type: string
+          description: 'Tax refund law indicator.'
+          example: '01'
+        plan:
+          type: string
+          description: 'The plan type.'
+          example: '0'
+        installments:
+          type: string
+          description: 'Number of installments for the transaction.'
+          example: '01'
+        currency:
+          type: string
+          description: 'ISO 3166 Numerical Code representing the country currency code.'
+          example: '858'
+        otherAmount:
+          type: string
+          description: 'Amount of the transaction tip. Including 2 decimal places.'
+          example: '0.02'
+        emvData: 
+          type: string
+          description: EMV Tags in TLV Format.
+          example: '7781d38202004057134452378550002500d25122010000000000000f5f3401009f10201f43fe6da00000000000000000001701000000000000000000000000000000009f26089093aa2fe4df18a29f360200579f6e04238c00009f2701809f38189f66049f02069f03069f1a0295055f2a029a039c019f37049f660426c000009f02060000000000029f03060000000000009f1a020858950500000000005f2a0208589a032003129c01009f3704febfb5739f3404000000009f3303e0f0c89f4101009f1e1030510174071223030000000000000000'
+        cardType:
+          $ref: '#/components/schemas/CardType'
+        billNumber:
+          type: string
+          description: 'Invoice number.'
+          example: '000258639'
+        invoiceAmount:
+          type: string
+          description: 'The invoice amount.'
+          example: '3.00'
+        taxedAmount:
+          type: string
+          description: 'The taxed amount.'
+          example: '2.46'
+        transactionType:
+          type: string 
+          description: 'The transaction type.'
+          example: '00'
+        purposeOfTransaction:
+          type: string
+          description: 'The transaction purpose.'
+          example: '02'
+        cardDetails:
+          $ref: '#/components/schemas/CardDetails'
+      
+    CardDetails:
+      type: object
+      description: The card details object.
+      properties:
+        cardType:
+          type: string
+          description: 'Possible card types are: CREDIT(1) or DEBIT(2).'
+          example: '1'
+        issuerName:
+          type: string
+          description: 'Card issuing bank.'
+          example: 'Bank name'
+        issuerBin:
+          type: integer
+          format: int64
+          example: '123456'
+        country:
+          type: string
+          maxLength: 2
+          description: 'ISO 3166 Numerical Code representing the country.'
+          example: 'UY'
+          
+    QrPurchaseRequest:
+      type: object
+      description: QrPurchaseRequest for Transaction.
+      properties:
+        baseRequest:
+          $ref: '#/components/schemas/BaseRequest'
+        merchQRCodeData:
+          $ref: '#/components/schemas/MerchQRCodeData'
+        deviceId:
+          $ref: '#/components/schemas/DeviceId'
+        cardType:
+          $ref: '#/components/schemas/CardType'
+        dateSystem:
+          $ref: '#/components/schemas/DateSystem'
+        requestID:
+          $ref: '#/components/schemas/RequestID'
+        institutionCode:
+          $ref: '#/components/schemas/InstitutionCode'
+          
+    QrPurchaseResponse:
+      type: object
+      description: QrPurchaseResponse for Transaction.
+      properties:
+        returnMessage:
+          $ref: '#/components/schemas/ReturnMessage'
+        requestID:
+          $ref: '#/components/schemas/RequestID'
+        institutionCode:
+          $ref: '#/components/schemas/InstitutionCode'
+        transactionMessage:
+          $ref: '#/components/schemas/TransactionMessage'
+        customInformation:
+          $ref: '#/components/schemas/CustomInformation'
+          
+    DagPurchaseResponse:
+      type: object
+      description: DagPurchaseResponse for Transaction.
+      properties:
+        returnMessage:
+          $ref: '#/components/schemas/ReturnMessage'
+        requestID:
+          $ref: '#/components/schemas/RequestID'
+        institutionCode:
+          $ref: '#/components/schemas/InstitutionCode'
+        transactionMessage:
+          $ref: '#/components/schemas/TransactionMessage'
+        customInformation:
+          $ref: '#/components/schemas/CustomInformation'
+    
+    EcommPurchaseResponse:
+      type: object
+      description: EcommPurchaseResponse for Transaction.
+      properties:
+        returnMessage:
+          $ref: '#/components/schemas/ReturnMessage'
+        requestID:
+          $ref: '#/components/schemas/RequestID'
+        institutionCode:
+          $ref: '#/components/schemas/InstitutionCode'
+        transactionMessage:
+          $ref: '#/components/schemas/TransactionMessage'
+        customInformation:
+          $ref: '#/components/schemas/CustomInformation'
+    
+    TransactionMessage:
+      type: object
+      description: Message of a transaction.
+      properties: 
+        name:
+          type: string
+          description: Name of a transaction message.
+          example: online_purchase
+        values:
+          $ref: '#/components/schemas/ISOValues'
+          
+    DateSystem:
+          type: string
+          format: date
+          example: '161220153609'
+          description: The system date in numeric format. 
+          
+    CustomInformation:
+          type: string
+          description: Custom additional information.
+          example: 'N/A'
+    
+    QrType:
+      type: integer
+      description: >
+        The QrCode types:
+        
+         * `01` - STATIC.
+         * `02` - DYNAMIC.
+      example: '1'
+      enum:
+      - 1
+      - 2
+      
+    CardType:
+          type: integer
+          description: >
+            Possible card types: 
+            
+            * `01` - CREDIT.
+            
+            * `02` - DEBIT.
+          example: '1'
+      
+    DeviceId:
+      type: integer
+      format: int64
+      description: The device unique identifier.
+      example: '15331'
+    
+    MerchQRCodeData:
+      type: string
+      description: "Merchant QR code data."
+      example: "{\"mAddDataFieldTmplRFU\":[],\"mBit55\":[],\"mInputData\":[{\"mObject\":\"VALUE_TIP\",\"mValue\":\"0.06\"}],\"mMerchantAccountInfo\":[[\"03\\u003dhst-pmt-fac-visa-id\"],[\"30\\u003d0011uy.com.vnet010802027264\",\"00\\u003duy.com.vnet\",\"01\\u003d02027264\"]],\"mPaymentSysSpecific\":[],\"mPointOfInitiationMethod\":\"DYNAMIC_QRCODE\",\"mTransactionInfo\":[{\"mObject\":\"MERCHANT_CATEGORY_CODE\",\"mValue\":\"5541\"},{\"mObject\":\"TRANSACTION_CURRENCY\",\"mValue\":\"840\"},{\"mObject\":\"TRANSACTION_AMOUNT\",\"mValue\":\"1.12\"},{\"mObject\":\"TIP_CONVENIENCE_INDICATOR\",\"mValue\":\"01\"},{\"mObject\":\"COUNTRY_CODE\",\"mValue\":\"UY\"},{\"mObject\":\"MERCHANT_NAME\",\"mValue\":\"AXION - EL TIGRE\"},{\"mObject\":\"MERCHANT_CITY\",\"mValue\":\"Uruguay\"},{\"mObject\":\"BILL_NUMBER\",\"mValue\":\"00000000\"},{\"mObject\":\"STORE_LABEL\",\"mValue\":\"001X17G8W01\"},{\"mObject\":\"TERMINAL_LABEL\",\"mValue\":\"42\"},{\"mObject\":\"PURPOSE_OF_TRANSACTION\",\"mValue\":\"01\"}],\"mUnreservedTemplates\":[[\"80\",\"00\\u003duy.com.vnet\",\"01\\u003d01\",\"02\\u003d06\",\"03\\u003d1.12\",\"04\\u003d1.02\",\"05\\u003d0\",\"06\\u003d0\"]],\"mVersion\":\"1.1\"}"
+          
+    MUnreservedTemplates:
+      type: array
+      items:
+        type: string
+        example: [["80","00 u003duy.com.vnet","01 u003d01","02 u003d01","03 u003d0.90","04 u003d0.74","05 u003d0","06 u003d22"]]
+        
+    MVersion:
+      type: string
+      example: "1.1"
+          
+    DataObjectInfo:
+      type: object
+      properties:
+        mObject:
+          $ref: '#/components/schemas/MObject'
+        mValue:
+          $ref: '#/components/schemas/MValue'
+          
+    MTransactionInfo:
+      type: array
+      items:
+        type: object
+        properties: 
+          dataObjectInfo:
+            $ref: '#/components/schemas/DataObjectInfo'
+          
+    PointOfInit:
+      type: string
+      description: >
+        Point of initialization. Valid values are:
+          
+        * `STATIC_QRCODE` - Value 11
+        
+        * `DYNAMIC_QRCODE` - Value 12
+      
+      enum:
+        - STATIC_QRCODE
+        - DYNAMIC_QRCODE
+          
+    MPointOfInitializationMethod:
+        $ref: '#/components/schemas/PointOfInit'
+          
+    MPaymentSysSpecific:
+      type: array
+      items:
+        type: string
+          
+    MMerchantAccountInfo:
+      type: array
+      items:
+        type: array
+        items: 
+          type: string
+          example: ["30","00 u003duy.com.vnet","01 u003d01000753"]
+          
+    MValue:
+      type: string
+      example: "2.00"
+          
+    MObject:
+      type: string
+      description: > 
+        Data object types (see the `DataObject` Schema and `DataFormat` enum). Valid values are:
+        
+        
+          * `POI_METHOD` - DataFormat.NUMERIC -  Point of Initiation Method - Length 2
+          * `TRANSACTION_AMOUNT` - DataFormat.ALPHA_NUMERIC_SPECIAL - Transaction Amount - Length 13
+          * `TRANSACTION_CURRENCY` - DataFormat.NUMERIC - Transaction Currency - Length 3
+          * `TIP_CONVENIENCE_INDICATOR` - DataFormat.NUMERIC - Tip or convenience indicator - Length 2
+          * `VALUE_TIP` - DataFormat.ALPHA_NUMERIC_SPECIAL - Tip to be paid to the Merchant - Length 13
+          * `VALUE_CONVENIENCE_FEE_FIXED` - DataFormat.ALPHA_NUMERIC_SPECIAL - Value of Convenience Fee Fixed - Length 13
+          * `VALUE_CONVENIENCE_FEE_PERCENTAGE` - DataFormat.ALPHA_NUMERIC_SPECIAL - Value of Convenience Fee porcentage - Length 5
+          * `GLOBALLY_UNIQUE_IDENTIFIER` - DataFormat.ALPHA_NUMERIC_SPECIAL - Globally Unique Identifier - Length 32
+          * `COUNTRY_CODE` - DataFormat.ALPHA_NUMERIC_SPECIAL - Country Code - Length 2
+          * `MERCHANT_CATEGORY_CODE` - DataFormat.NUMERIC - Merchant Category Code - Length 4
+          * `MERCHANT_NAME` - DataFormat.ALPHA_NUMERIC_SPECIAL - Merchant Name - Length 25
+          * `MERCHANT_CITY` - DataFormat.ALPHA_NUMERIC_SPECIAL - Merchant City - Length 15
+          * `POSTAL_CODE` - DataFormat.ALPHA_NUMERIC_SPECIAL - Postal Code - Length 10
+          * `LANGUAGE_PREFERENCE` - DataFormat.ALPHA_NUMERIC_SPECIAL - Language Preference - Length 2
+          * `MERCHANT_NAME_ALT_LANGUAGE` - DataFormat.STRING - Merchant Name—Alternate Language - Length 25
+          * `MERCHANT_CITY_ALT_LANGUAGE` - DataFormat.STRING - Merchant City—Alternate Language - Length 15
+          * `BILL_NUMBER` - DataFormat.ALPHA_NUMERIC_SPECIAL - Bill Number - Length 25
+          * `MOBILE_NUMBER` - DataFormat.ALPHA_NUMERIC_SPECIAL - Mobile Number - Length 25
+          * `STORE_LABEL` - DataFormat.ALPHA_NUMERIC_SPECIAL - Store Label - Length 25
+          * `LOYALTY_NUMBER` - DataFormat.ALPHA_NUMERIC_SPECIAL - Loyalty Number - Length 25
+          * `REFERENCE_LABEL` - DataFormat.ALPHA_NUMERIC_SPECIAL - Reference Label - Length 25
+          * `CUSTOMER_LABEL` - DataFormat.ALPHA_NUMERIC_SPECIAL - Customer Label - Length 25
+          * `TERMINAL_LABEL` - DataFormat.ALPHA_NUMERIC_SPECIAL - Terminal Label - Length 25
+          * `PURPOSE_OF_TRANSACTION` - DataFormat.ALPHA_NUMERIC_SPECIAL - Purpose of Transaction - Length 25
+          * `ADDRESS_OF_CONSUMER` - DataFormat.STRING - Address of the consumer - Length 32
+          * `MOBILE_NUMBER_CONSUMER` - DataFormat.ALPHA_NUMERIC_SPECIAL - Mobile number of the consumer - Length 25
+          * `EMAIL_CONSUMER` - DataFormat.STRING - Email address of the consumer - Length 64
+      enum:
+        - POI_METHOD
+        - TRANSACTION_AMOUNT
+        - TRANSACTION_CURRENCY
+        - TIP_CONVENIENCE_INDICATOR
+        - VALUE_TIP
+        - VALUE_CONVENIENCE_FEE_FIXED
+        - VALUE_CONVENIENCE_FEE_PERCENTAGE
+        - GLOBALLY_UNIQUE_IDENTIFIER
+        - COUNTRY_CODE
+        - MERCHANT_CATEGORY_CODE
+        - MERCHANT_NAME
+        - MERCHANT_CITY
+        - POSTAL_CODE
+        - LANGUAGE_PREFERENCE
+        - MERCHANT_NAME_ALT_LANGUAGE
+        - MERCHANT_CITY_ALT_LANGUAGE 
+        - BILL_NUMBER
+        - MOBILE_NUMBER
+        - STORE_LABEL
+        - LOYALTY_NUMBER
+        - REFERENCE_LABEL
+        - CUSTOMER_LABEL
+        - TERMINAL_LABEL
+        - PURPOSE_OF_TRANSACTION
+        - ADDRESS_OF_CONSUMER
+        - MOBILE_NUMBER_CONSUMER
+        - EMAIL_CONSUMER
+      example: TRANSACTION_AMOUNT
+          
+    DataObjectInput: 
+      properties:
+        mObject:
+          $ref: '#/components/schemas/MObject'
+        mValue:
+          $ref: '#/components/schemas/MValue'
+          
+    MInputData:
+      type: array
+      description: The objects in this array are of type `DataObjectInfo.
+      items:
+        $ref: '#/components/schemas/DataObjectInput'
+          
+    MBit55:
+      type: string
+      format: byte
+      example: []
+          
+    MAddDataFieldTmplRFU:
+      type: array
+      items:
+        type: string
+      
+    ExpirationDate:
+      type: object
+      description: 'Year and month of expiration.'
+      properties:
+        month:
+          type: string
+          description: 'The month of expiration in numeric format.'
+          example: '08'
+        year:
+          type: string
+          description: 'The year of expiration in numeric format.'
+          example: '2022'
+        
+    ISOValues: 
+      type: object
+      description: ISOValues.
+      properties: 
+        pan:
+          type: string
+          description: 'Primary Account Number (PAN) is the 1-digit number on a payment instrument.'
+          example: 4912 1847 0031 9481
+        amount:
+          type: string
+          description: 'Amount of the transaction. Including 2 decimal places.'
+          example: '2.24'
+        dateTime: 
+          type: string
+          description: 'Transaction date and time in (MMddHHmmss) format.'
+          example: '0312145237'
+        auditNumber:
+          type: string
+          description: 'Audit Number Unique by transaction and terminal originated.'
+          example: '131945'
+        time: 
+          type: string
+          description: Transaction time in (HHmmss) format.
+          example: '145237'
+        date: 
+          type: string
+          description: Transaction date in (MMdd) format.
+          example: '0312'
+        expirationDate: 
+          type: string
+          description: 'Transaction expiration date in (MMddHHmmss) format.'
+          example: '0312145237'
+        closingDate: 
+          type: string
+          description: Closing date in (MMdd) format.
+          example: '0304'
+        posEntryMode: 
+          type: string
+          description: 'POS Entry Mode Fixed value “071” for Visanet – Contactless.'
+          example: '071'
+        idAcquirer: 
+          type: string
+          example: 'uy.com.vnet'
+        posConditionCode: 
+          type: string
+          example: '00'
+        track2:
+          type: string
+          description: 'Track 2 Data (NFC Token Data).'
+          example: '4452378550002500D2512201000000000000'
+        referenceNumber: 
+          type: string
+          example: '046539220590'
+        authorizationCode:
+          type: string
+          example: '081409'
+        responseCode: 
+          type: string
+          example: '00'
+        idTerminal:
+          type: string
+          description: 'Terminal Identifier.'
+          example: '01008225008'
+        idMerchant:
+          type: string
+          example: '12122'
+        track1: 
+          type: string
+        additionalData: 
+          type: string
+          example: 'indi=6;invoiceNumber=000000000'
+        additionalTrxData:
+          type: string
+          example: 'planType=1;feeQuantity=01;ticketNumber=0000;date=000000;deferredMonth=0;plan=00'
+        currencyCode:
+          type: string
+          description: 'The Transaction Currency shall conform to [ISO 4217] and shall contain the 3-digit numeric representation of the currency. For example, USD is represented by the value "840". _x005F_x000D_ The value should indicate the transaction currency in which the merchant transacts..'
+          example: '858'
+        pinBlock:
+          type: string
+        ksn:
+          type: string
+        otherAmount:
+          type: string
+          description: 'Amount of the transaction including tip. Including 2 decimal places.'
+          example: '0.02'
+        emvData: 
+          type: string
+          description: EMV Tags in TLV Format.
+          example: '7781d38202004057134452378550002500d25122010000000000000f5f3401009f10201f43fe6da00000000000000000001701000000000000000000000000000000009f26089093aa2fe4df18a29f360200579f6e04238c00009f2701809f38189f66049f02069f03069f1a0295055f2a029a039c019f37049f660426c000009f02060000000000029f03060000000000009f1a020858950500000000005f2a0208589a032003129c01009f3704febfb5739f3404000000009f3303e0f0c89f4101009f1e1030510174071223030000000000000000'
+        terminalIndicators: 
+          type: string
+          example: 'invoiceAmount=2.22;taxedAmount=0.0;cardType=1;devolutionAmount=2.22'
+        applicationVersion: 
+          type: string
+        terminalType: 
+          type: string
+        ticketInformation:
+          type: string
+          description: 'Custom data related to transaction ticket and batch numbers.'
+          example: 'ticketNumber=0001;batchNumber=001'
+        additionalInformation:
+          type: string
+          example: 'message=LOTE CERRADO'
+        brandTransactionID:
+          type: string
+        specific126:
+          type: string
+    TransactionIdsRequest:
+      type: object
+      description: Object containing the transaction ID to cancel, specify just one of them.
+      properties:
+        transactionID:
+          type: string
+          description: 'Unique transaction identifier generated by HST for the purchase transaction.'
+          maxLength: 64
+          example: '155156157'
+        acquirerTransactionID:
+          type: string
+          description: 'Acquirer transaction ID (ISO8583 field 37) for the purchase transaction.'
+          maxLength: 64
+          example: '158159160'
+        networkTransactionID:
+          type: string
+          description: 'Network transaction Identifier (ISO8583 field 62.2) generated by the Brand for the purchase transaction.'
+          maxLength: 64
+          example: '161162163'
+    CancelResponse:
+      type: object
+      required:
+        - request-id
+        - auditNumber
+        - acquirerTransactionID
+        - transactionID
+        - brandTransactionID
+        - responseCode
+        - originalTransactionID
+        - success
+      description: The cancel response.
+      properties:
+        request-id:
+          type: string
+          description: The same request-id as request parameter.
+          example: '0112313546456'
+        auditNumber:
+          type: string
+          description: The System trace audit number (STAN) (Field 11 ISO 8583)
+          example: '000644'
+        acquirerTransactionID:
+          type: string
+          description: Retrieval reference number (Field 37 ISO 8583)
+          example: '00123'
+        transactionID:
+          type: string
+          description: The ID to cancel transaction generated by HST.
+          example: '300123'
+        brandTransactionID:
+          type: string
+          description: The brand transaction ID (Field 115 ISO 8583)
+          example: '300456'
+        responseCode:
+          type: string
+          description: The transaction response code (Field 39 ISO 8583)
+          example: '300789'
+        originalTransactionID:
+          type: string
+          description: The transaction ID of the original transaction canceled (Previously generated by HST)
+          example: '205000'
+        success:
+          type: boolean
+          description: Returns true if the transaction was canceled.
+          example: true
+    RefundResponse:
+      type: object
+      required:
+        - request-id
+        - auditNumber
+        - acquirerTransactionID
+        - transactionID
+        - brandTransactionID
+        - responseCode
+        - originalTransactionID
+        - success
+      description: The refund response.
+      properties:
+        request-id:
+          type: string
+          description: The same request-id as request parameter.
+          example: '0112313546456'
+        auditNumber:
+          type: string
+          description: The System trace audit number (STAN) (Field 11 ISO 8583)
+          example: '000644'
+        acquirerTransactionID:
+          type: string
+          description: Retrieval reference number (Field 37 ISO 8583)
+          example: '00123'
+        transactionID:
+          type: string
+          description: The ID to refund transaction generated by HST.
+          example: '300123'
+        brandTransactionID:
+          type: string
+          description: The brand transaction ID (Field 115 ISO 8583)
+          example: '300456'
+        responseCode:
+          type: string
+          description: The transaction response code (Field 39 ISO 8583)
+          example: '300789'
+        originalTransactionID:
+          type: string
+          description: The transaction ID of the original transaction refunded (Previously generated by HST)
+          example: '205000'
+        success:
+          type: boolean
+          description: Returns true if the transaction was refunded.
+          example: true
+    ErrorInfo:
+      type: object
+      required:
+        - request-id
+        - timestamp
+      properties:
+        request-id:
+          type: string
+          description: The auto generated request ID used for tracking the request.
+        timestamp:
+          type: string
+          description: The date-time when occurred the error.
+        returnCode:
+          $ref: '#/components/schemas/ReturnCode'
+        returnDescription:
+          type: string
+          description: Returns the description when any of the warnings (200 HTTP Response) or error (500 HTTP Response) occurs.
+      example:
+        request-id: '0112313546456'
+        timestamp: '2017-07-21T17:32:28Z'
+        returnCode: '02'
+        returnDescription: Terminal code not found in database.
+    ReturnCode:
+      type: string
+      description: >
+        The returnCode for the requests to HST Transaction can return the following values on the 'returnCode' property:
+         * `01` - Ok with a warning condition. Check the 'returnDescription' property for more details.
+         * `02` - Specific record not found in database. Check the 'returnDescription' property for more details.
+      enum:
+        - '01'
+        - '02'
+    
