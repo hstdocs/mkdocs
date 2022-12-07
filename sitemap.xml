@@ -2,67 +2,77 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://hst.com.br/</loc>
-         <lastmod>2022-12-05</lastmod>
+         <lastmod>2022-12-07</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://hst.com.br/alta_disponibilidade/</loc>
-         <lastmod>2022-12-05</lastmod>
+         <lastmod>2022-12-07</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://hst.com.br/failback/</loc>
+         <lastmod>2022-12-07</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://hst.com.br/failover/</loc>
+         <lastmod>2022-12-07</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://hst.com.br/instalacao/</loc>
-         <lastmod>2022-12-05</lastmod>
+         <lastmod>2022-12-07</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://hst.com.br/replicacao_fisica/</loc>
-         <lastmod>2022-12-05</lastmod>
+         <lastmod>2022-12-07</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://hst.com.br/testes/</loc>
-         <lastmod>2022-12-05</lastmod>
+         <lastmod>2022-12-07</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://hst.com.br/swagger/bill-provider-service/bill-provider-service-swagger-page/</loc>
-         <lastmod>2022-12-05</lastmod>
+         <lastmod>2022-12-07</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://hst.com.br/swagger/merchant-service/merchant-service-swagger-page/</loc>
-         <lastmod>2022-12-05</lastmod>
+         <lastmod>2022-12-07</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://hst.com.br/swagger/qr-code-generator/qr-code-generator-swagger-page/</loc>
-         <lastmod>2022-12-05</lastmod>
+         <lastmod>2022-12-07</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://hst.com.br/swagger/recover-data/recover-data-swagger-page/</loc>
-         <lastmod>2022-12-05</lastmod>
+         <lastmod>2022-12-07</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://hst.com.br/swagger/scheduler/scheduler-swagger-page/</loc>
-         <lastmod>2022-12-05</lastmod>
+         <lastmod>2022-12-07</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://hst.com.br/swagger/terminals/terminals-swagger-page/</loc>
-         <lastmod>2022-12-05</lastmod>
+         <lastmod>2022-12-07</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://hst.com.br/swagger/transaction-orchestrator/transaction-orchestrator-swagger-page/</loc>
-         <lastmod>2022-12-05</lastmod>
+         <lastmod>2022-12-07</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://hst.com.br/swagger/transaction-service/transaction-service-swagger-page/</loc>
-         <lastmod>2022-12-05</lastmod>
+         <lastmod>2022-12-07</lastmod>
          <changefreq>daily</changefreq>
     </url>
 </urlset>

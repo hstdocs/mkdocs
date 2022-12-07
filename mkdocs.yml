@@ -78,6 +78,7 @@ theme:
 
 # Plugins
 plugins:
+  - mkdocs-video
   - search
   - redirects:
       redirect_maps:
@@ -89,7 +90,7 @@ plugins:
         sponsorship.md: insiders/index.md
         upgrading.md: upgrade.md
   - minify:
-      minify_html: true
+      minify_html: true   
 
 # Customization
 extra:
