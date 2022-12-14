@@ -189,10 +189,10 @@ function decryptor_reaction(content_decrypted, password_input, fallback_used, se
     if (content_decrypted) {
         // keep password value on sessionStorage/localStorage with specific path (relative)
         if (set_global) {
-            setItemExpiry("", password_input.value, 1000*3600*1);
+            setItemExpiry("", password_input.value, 1000*3600*24);
         }
         else if (!fallback_used) {
-            setItemExpiry(location_path, password_input.value, 1000*3600*1);
+            setItemExpiry(location_path, password_input.value, 1000*3600*24);
         }
         // continue to decrypt others parts
         
